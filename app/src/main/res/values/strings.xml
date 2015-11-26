@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">GetConnected</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name ="facebook_app_id">1510375285927059</string>
+    <string name="title_activity_signup">Signup</string>
+    <string name="title_activity_home">Home</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_album">AlbumActivity</string>
+    <string name="title_activity_create_photo_with_album">CreatePhotoWithAlbum</string>
+    <string name="title_activity_add_photos">AddPhotos</string>
+
+
+
+</resources>

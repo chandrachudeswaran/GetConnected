@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="D:\AndroidWS\GetConnected\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\23.0.1\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="4356e230a981d1bbf047d848b91bc0d9b7c5bacc">
+        <dex dex="D:\AndroidWS\GetConnected\app\build\intermediates\pre-dexed\debug\classes-5f31b7a720e79e7915b03ef1ba44cb7c6f496e78.jar" />
+    </item>
+
+</items>
