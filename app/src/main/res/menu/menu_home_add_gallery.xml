@@ -1,0 +1,27 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+    <item
+        android:id="@+id/pic"
+        android:orderInCategory="100"
+        android:icon="@drawable/male_profile"
+        android:title="Profile"
+        android:actionViewClass="android.widget.ImageView"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/addalbum"
+        android:icon="@drawable/gallery"
+        android:orderInCategory="100"
+        android:title="CreateAlbum"
+        android:onClick="createAlbum"
+        app:showAsAction="ifRoom" />
+
+
+
+    <item
+        android:id="@+id/logout"
+        android:orderInCategory="100"
+        android:title="Logout"
+        app:showAsAction="never" />
+</menu>

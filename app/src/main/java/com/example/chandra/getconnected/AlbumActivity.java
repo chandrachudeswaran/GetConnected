@@ -34,6 +34,7 @@ public class AlbumActivity extends AppCompatActivity {
     String title;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +42,6 @@ public class AlbumActivity extends AppCompatActivity {
 
         album_title = (EditText) findViewById(R.id.album);
         privacy = (RadioGroup) findViewById(R.id.accessgroup);
-
 
 
     }
@@ -67,6 +67,7 @@ public class AlbumActivity extends AppCompatActivity {
                         ActivityUtility.Helper.makeToast(AlbumActivity.this, album_title.getText().toString() + "  " + "album Created");
                         Intent intent = new Intent(AlbumActivity.this, CreatePhotoWithAlbum.class);
                         intent.putExtra(ParseConstants.ALBUM_TABLE, album.getObjectId());
+                        intent.putExtra(GetConnectedConstants.EXISTING_ALBUM,false);
                         startActivity(intent);
                         finish();
                     } else {
@@ -86,6 +87,11 @@ public class AlbumActivity extends AppCompatActivity {
         } else {
             return true;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 
 

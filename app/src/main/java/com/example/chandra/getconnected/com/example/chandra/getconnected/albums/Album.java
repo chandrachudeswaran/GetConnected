@@ -1,6 +1,10 @@
 package com.example.chandra.getconnected.com.example.chandra.getconnected.albums;
 
+import android.graphics.Bitmap;
+
 import com.parse.ParseUser;
+
+import java.util.ArrayList;
 
 /**
  * Created by chandra on 11/25/2015.
@@ -10,6 +14,8 @@ public class Album {
     String title;
     boolean isPublic;
     String userid;
+    Bitmap album_image;
+    String objectId;
 
     public String getTitle() {
         return title;
@@ -35,7 +41,23 @@ public class Album {
         this.userid = userid;
     }
 
-    public Album(){
-        
+    public Bitmap getAlbum_image() {
+        return album_image;
+    }
+
+    public void setAlbum_image(Bitmap album_image) {
+        this.album_image = album_image;
+    }
+
+    public String getObjectId() {
+        return objectId;
+    }
+
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
+    }
+
+    public Album() {
+
     }
 }

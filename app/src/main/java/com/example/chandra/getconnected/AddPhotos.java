@@ -179,6 +179,8 @@ public class AddPhotos extends AppCompatActivity {
                 public void done(ParseException e) {
                     if (e == null) {
                         dialog.dismiss();
+                        Intent intent = new Intent();
+                        setResult(RESULT_OK,intent);
                         finish();
                     } else {
                         ActivityUtility.Helper.writeErrorLog(e.toString());

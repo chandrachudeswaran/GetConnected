@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
@@ -28,6 +29,7 @@ public class PhotoAdapter extends BaseAdapter {
 
 
     public PhotoAdapter(Context context, int resource, ArrayList<Bitmap> list) {
+
         this.context = context;
         this.resource = resource;
         this.list = list;
@@ -58,7 +60,7 @@ public class PhotoAdapter extends BaseAdapter {
         }
         ImageView imageView = (ImageView) convertView.findViewById(R.id.imageGrid);
         imageView.setImageBitmap(list.get(position));
-        return null;
+        return convertView;
     }
 
 

@@ -31,47 +31,51 @@ public class GetPhotos {
     ArrayList<Bitmap> list;
     ImageList imageList;
 
-    public GetPhotos(Context context,ParseObject album,ImageList imageList){
-        this.context=context;
-        this.album=album;
-        this.imageList=imageList;
-        //displayDialog();
-        query();
+    public GetPhotos(Context context, ParseObject album, ImageList imageList, boolean existing) {
+        this.context = context;
+        this.album = album;
+        this.imageList = imageList;
+        list = new ArrayList<>();
+
+
+        if (existing) {
+            displayDialog();
+            query();
+        }
+        else{
+            imageList.sendImages(list);
+        }
+
     }
 
     public void displayDialog() {
         dialog = new ProgressDialog(context);
-        dialog.setMessage("Downloading photos");
+        dialog.setMessage("Downloading photos for  " + album.getString(ParseConstants.ALBUM_FIELD_TITLE));
         dialog.setCancelable(false);
         dialog.show();
     }
 
     public void query() {
-        ActivityUtility.Helper.writeErrorLog("query");
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.PHOTO_TABLE);
         query.whereEqualTo(ParseConstants.PHOTO_ALBUM, album);
         query.findInBackground(new FindCallback<ParseObject>() {
                                    @Override
                                    public void done(List<ParseObject> objects, ParseException e) {
                                        if (e == null) {
-                                           ActivityUtility.Helper.writeErrorLog("Firstif");
                                            for (ParseObject parseObject : objects) {
                                                file = parseObject.getParseFile(ParseConstants.PHOTO_FIELD_FILE);
                                                file.getDataInBackground(new GetDataCallback() {
                                                    @Override
                                                    public void done(byte[] data, ParseException e) {
-
-                                                           ActivityUtility.Helper.writeErrorLog("sec");
-                                                           list.add(BitmapFactory.decodeByteArray(data, 0, data.length));
-                                                           setImage();
+                                                       list.add(BitmapFactory.decodeByteArray(data, 0, data.length));
+                                                       setImage();
 
 
                                                    }
                                                });
                                            }
 
-                                       }
-                                       else{
+                                       } else {
                                            ActivityUtility.Helper.writeErrorLog("Photos null");
                                        }
                                    }
@@ -82,13 +86,14 @@ public class GetPhotos {
     }
 
     public void setImage() {
-        ActivityUtility.Helper.writeErrorLog("Hello");
         dialog.dismiss();
         imageList.sendImages(list);
 
     }
 
-    public interface ImageList{
+    public interface ImageList {
         public void sendImages(ArrayList<Bitmap> images);
     }
+
+
 }

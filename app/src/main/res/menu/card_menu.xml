@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/sharedusers"
+        android:orderInCategory="100"
+        android:title="Show Shared Users"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/showphotos"
+        android:orderInCategory="100"
+        android:title="Show Photos"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/addphotos"
+        android:orderInCategory="100"
+        android:title="Add Photos"
+        app:showAsAction="never" />
+</menu>

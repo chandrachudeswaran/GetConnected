@@ -2,11 +2,11 @@
 <items version="2" >
 
     <item
-        jar="D:\AndroidWS\GetConnected\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\23.0.1\jars\classes.jar"
+        jar="D:\AndroidWS\GetConnected\app\build\intermediates\exploded-aar\com.android.support\cardview-v7\23.0.1\jars\classes.jar"
         jumboMode="false"
         revision="23.0.1"
-        sha1="4356e230a981d1bbf047d848b91bc0d9b7c5bacc">
-        <dex dex="D:\AndroidWS\GetConnected\app\build\intermediates\pre-dexed\debug\classes-5f31b7a720e79e7915b03ef1ba44cb7c6f496e78.jar" />
+        sha1="39ae02ce40c3ac828abbf780ce0ff5d7a28b7d6a">
+        <dex dex="D:\AndroidWS\GetConnected\app\build\intermediates\pre-dexed\debug\classes-e95b762f806505a76641cdf94a8302f21e9df11f.jar" />
     </item>
 
 </items>

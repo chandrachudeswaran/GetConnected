@@ -27,6 +27,7 @@
         android:layout_height="200dp"
         android:layout_gravity="center"
         android:id="@+id/photo"
+        android:src="@drawable/blankimage"
         android:onClick="uploadImage"
         android:layout_marginTop="20dp" />
 

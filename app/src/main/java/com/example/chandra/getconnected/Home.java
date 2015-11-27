@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 
+import com.example.chandra.getconnected.com.example.chandra.getconnected.albums.Album;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
@@ -36,12 +37,13 @@ import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
 
-public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum{
+public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum,ShowUsers.OnCreateUsers,ShowMessages.OnCreateMessages,ShowNotifications.OnCreateNotifications{
     private Toolbar mToolbar;
     private CoordinatorLayout coordinatorLayout;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     ParseUser user;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,47 +85,10 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
 
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-
-
-        getMenuInflater().inflate(R.menu.menu_home, menu);
-
-        return true;
+    public void createAlbum(MenuItem item) {
+        doCreateAlbum();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.logout) {
-            if (user.get("authData").toString().contains("twitter")) {
-                ParseUser.logOut();
-            }
-            if (user.get("authData").toString().contains("facebook")) {
-                AccessToken accessToken = AccessToken.getCurrentAccessToken();
-                if (accessToken != null) {
-                    LoginManager.getInstance().logOut();
-                }
-                ParseUser.logOut();
-                finish();
-
-            } else {
-
-                ParseUser.logOut();
-                finish();
-            }
-        }
-
-
-        return super.onOptionsItemSelected(item);
-    }
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -173,9 +138,19 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
         }
     }
 
-    @Override
-    public void createAlbum() {
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ActivityUtility.Helper.writeErrorLog("Resume" + " " + "Home");
+    }
+
+    @Override
+    public void doFinish() {
+        finish();
+    }
+
+    public void doCreateAlbum(){
         Intent intent = new Intent(Home.this,AlbumActivity.class);
         startActivity(intent);
     }

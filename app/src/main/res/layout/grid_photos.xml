@@ -6,8 +6,10 @@
 
 
     <ImageView
+        android:id="@+id/imageGrid"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:scaleType="fitXY"
-        android:id="@+id/imageGrid"/>
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp" />
 </LinearLayout>

@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.chandra.getconnected.com.example.chandra.getconnected.albums.GetPhotos;
@@ -35,6 +36,7 @@ public class CreatePhotoWithAlbum extends AppCompatActivity implements GetPhotos
     String album_id;
     TextView title;
     TextView message;
+    boolean condition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,52 @@ public class CreatePhotoWithAlbum extends AppCompatActivity implements GetPhotos
         title = (TextView) findViewById(R.id.albumtitle);
         message = (TextView) findViewById(R.id.hint);
         album_id = getIntent().getExtras().getString(ParseConstants.ALBUM_TABLE);
+        condition = getIntent().getExtras().getBoolean(GetConnectedConstants.EXISTING_ALBUM);
+        queryForPhotos(condition);
+
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_create_photo_with_album, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.addPhotos) {
+
+            Intent intent = new Intent(CreatePhotoWithAlbum.this, AddPhotos.class);
+            intent.putExtra(ParseConstants.ALBUM_TABLE, album_id);
+            startActivityForResult(intent, 100);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void sendImages(ArrayList<Bitmap> images) {
+
+        if (images.isEmpty()) {
+
+            message.setText(GetConnectedConstants.NO_PHOTOS);
+        } else {
+            message.setText(" ");
+            PhotoAdapter adapter = new PhotoAdapter(CreatePhotoWithAlbum.this, R.layout.grid_photos, images);
+            grid.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+
+
+
+
+    public void queryForPhotos(final boolean existing) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.ALBUM_TABLE);
         query.whereEqualTo("objectId", album_id);
         query.getFirstInBackground(new GetCallback<ParseObject>() {
@@ -58,52 +106,24 @@ public class CreatePhotoWithAlbum extends AppCompatActivity implements GetPhotos
                     title.setText(object.getString(ParseConstants.ALBUM_FIELD_TITLE));
                 }
 
-                 new GetPhotos(CreatePhotoWithAlbum.this, album, CreatePhotoWithAlbum.this);
+                new GetPhotos(CreatePhotoWithAlbum.this, album, CreatePhotoWithAlbum.this, existing);
             }
         });
-
-
     }
 
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_create_photo_with_album, menu);
-        return true;
-    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 100) {
+            if (resultCode == RESULT_OK) {
+                queryForPhotos(true);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.addPhotos) {
-
-            Intent intent = new Intent(CreatePhotoWithAlbum.this, AddPhotos.class);
-            intent.putExtra(ParseConstants.ALBUM_TABLE, album_id);
-            startActivity(intent);
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void sendImages(ArrayList<Bitmap> images) {
-
-        if (images == null) {
-            message.setText("no");
-        } else {
-            message.setText("no");
-            PhotoAdapter adapter = new PhotoAdapter(CreatePhotoWithAlbum.this, R.layout.grid_photos, images);
-            grid.setAdapter(adapter);
-            adapter.notifyDataSetChanged();
+            }
         }
     }
 
-
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
 }
