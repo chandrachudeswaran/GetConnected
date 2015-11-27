@@ -12,6 +12,7 @@
     <string name="title_activity_album">AlbumActivity</string>
     <string name="title_activity_create_photo_with_album">CreatePhotoWithAlbum</string>
     <string name="title_activity_add_photos">AddPhotos</string>
+    <string name="title_activity_show_album">ShowAlbum</string>
 
 
 

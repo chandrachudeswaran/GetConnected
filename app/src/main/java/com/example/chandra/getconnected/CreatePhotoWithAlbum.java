@@ -1,38 +1,31 @@
 package com.example.chandra.getconnected;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.GridView;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.chandra.getconnected.com.example.chandra.getconnected.albums.GetPhotos;
-import com.example.chandra.getconnected.com.example.chandra.getconnected.albums.PhotoAdapter;
+import com.example.chandra.getconnected.albums.GetPhotos;
+import com.example.chandra.getconnected.albums.ImageListImpl;
+import com.example.chandra.getconnected.albums.PhotoAdapter;
+import com.example.chandra.getconnected.constants.GetConnectedConstants;
+import com.example.chandra.getconnected.constants.ParseConstants;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
-public class CreatePhotoWithAlbum extends AppCompatActivity implements GetPhotos.ImageList {
+public class CreatePhotoWithAlbum extends AppCompatActivity {
     private Toolbar mToolbar;
     ParseObject album;
     GridView grid;
-    Bitmap picture;
     String album_id;
     TextView title;
     TextView message;
@@ -77,23 +70,6 @@ public class CreatePhotoWithAlbum extends AppCompatActivity implements GetPhotos
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void sendImages(ArrayList<Bitmap> images) {
-
-        if (images.isEmpty()) {
-
-            message.setText(GetConnectedConstants.NO_PHOTOS);
-        } else {
-            message.setText(" ");
-            PhotoAdapter adapter = new PhotoAdapter(CreatePhotoWithAlbum.this, R.layout.grid_photos, images);
-            grid.setAdapter(adapter);
-            adapter.notifyDataSetChanged();
-        }
-    }
-
-
-
-
 
     public void queryForPhotos(final boolean existing) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.ALBUM_TABLE);
@@ -106,7 +82,7 @@ public class CreatePhotoWithAlbum extends AppCompatActivity implements GetPhotos
                     title.setText(object.getString(ParseConstants.ALBUM_FIELD_TITLE));
                 }
 
-                new GetPhotos(CreatePhotoWithAlbum.this, album, CreatePhotoWithAlbum.this, existing);
+                new GetPhotos(CreatePhotoWithAlbum.this, album, new ImageListImpl(message,grid,R.layout.grid_photos,CreatePhotoWithAlbum.this), existing);
             }
         });
     }

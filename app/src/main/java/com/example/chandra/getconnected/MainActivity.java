@@ -2,27 +2,18 @@ package com.example.chandra.getconnected;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
+import com.example.chandra.getconnected.constants.GetConnectedConstants;
+import com.example.chandra.getconnected.utility.ActivityUtility;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -30,7 +21,6 @@ import com.parse.LogInCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
-import com.parse.ParseObject;
 import com.parse.ParseTwitterUtils;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -99,9 +89,8 @@ public class MainActivity extends AppCompatActivity {
         email_edit = (EditText) findViewById(R.id.username);
         password_edit = (EditText) findViewById(R.id.password);
         tweets = (TwitterLoginButton) findViewById(R.id.submit_twittert);
-
         ParseUser user = ParseUser.getCurrentUser();
-        if(user!=null){
+        if (user != null) {
             showHome();
         }
 
@@ -151,8 +140,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        tweets.onActivityResult(requestCode, resultCode, data);
-        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case 100:
+                if (resultCode == RESULT_OK) {
+                    if(ParseUser.getCurrentUser()!=null){
+                        finish();
+                    }
+                }
+                break;
+            default:
+                tweets.onActivityResult(requestCode, resultCode, data);
+                ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
+                break;
+        }
+
     }
 
     private void getUserDetailsFromFB() {
@@ -183,9 +184,9 @@ public class MainActivity extends AppCompatActivity {
     public void saveUserInParse() {
         ParseUser user = ParseUser.getCurrentUser();
         user.setUsername(username);
-        String[] names= username.split(" ");
-        user.put(GetConnectedConstants.USER_FIRST_NAME,names[0]);
-        user.put(GetConnectedConstants.USER_LAST_NAME,names[1]);
+        String[] names = username.split(" ");
+        user.put(GetConnectedConstants.USER_FIRST_NAME, names[0]);
+        user.put(GetConnectedConstants.USER_LAST_NAME, names[1]);
         user.setEmail(email);
         user.saveInBackground(new SaveCallback() {
             @Override
@@ -199,8 +200,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void doSignup(View v){
-        Intent intent= new Intent(MainActivity.this,Signup.class);
+    public void doSignup(View v) {
+        Intent intent = new Intent(MainActivity.this, Signup.class);
         startActivity(intent);
     }
 
@@ -240,20 +241,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void doLogin(View v){
+    public void doLogin(View v) {
 
-        if(email_edit.getText().length()==0 || password_edit.getText().length()==0){
-            ActivityUtility.Helper.makeToast(MainActivity.this,GetConnectedConstants.MANDATORY_FIELDS_MISSING);
+        if (email_edit.getText().length() == 0 || password_edit.getText().length() == 0) {
+            ActivityUtility.Helper.makeToast(MainActivity.this, GetConnectedConstants.MANDATORY_FIELDS_MISSING);
             return;
-        }else{
+        } else {
             ParseUser.logInInBackground(email_edit.getText().toString(), password_edit.getText().toString(), new LogInCallback() {
                 @Override
                 public void done(ParseUser user, ParseException e) {
 
-                    if(e==null){
+                    if (e == null) {
                         showHome();
-                    }else{
-                        ActivityUtility.Helper.makeToast(MainActivity.this,"Login Failed");
+                    } else {
+                        ActivityUtility.Helper.makeToast(MainActivity.this, "Login Failed");
                         ActivityUtility.Helper.writeErrorLog(e.toString());
                     }
                 }
@@ -262,9 +263,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void showHome(){
-        Intent intent = new Intent(MainActivity.this,Home.class);
-        startActivity(intent);
+    public void showHome() {
+        Intent intent = new Intent(MainActivity.this, Home.class);
+        startActivityForResult(intent, 100);
     }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
 
 }

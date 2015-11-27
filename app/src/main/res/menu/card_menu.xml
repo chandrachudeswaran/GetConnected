@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/sharedusers"
+        android:id="@+id/sharealbum"
         android:orderInCategory="100"
-        android:title="Show Shared Users"
+        android:title="Share Album"
         app:showAsAction="never" />
 
     <item
@@ -19,4 +19,6 @@
         android:orderInCategory="100"
         android:title="Add Photos"
         app:showAsAction="never" />
+
+
 </menu>

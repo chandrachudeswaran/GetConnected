@@ -10,25 +10,16 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 
-
-import com.example.chandra.getconnected.com.example.chandra.getconnected.albums.Album;
-import com.facebook.AccessToken;
+import com.example.chandra.getconnected.constants.GetConnectedConstants;
+import com.example.chandra.getconnected.utility.ActivityUtility;
 import com.facebook.FacebookSdk;
-import com.facebook.login.LoginManager;
 
 import com.parse.Parse;
-import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseTwitterUtils;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 
@@ -153,5 +144,12 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
     public void doCreateAlbum(){
         Intent intent = new Intent(Home.this,AlbumActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        setResult(RESULT_OK,intent);
+        finish();
     }
 }

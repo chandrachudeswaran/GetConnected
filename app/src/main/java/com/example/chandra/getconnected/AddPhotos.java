@@ -17,15 +17,15 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.example.chandra.getconnected.com.example.chandra.getconnected.albums.GetPhotos;
+import com.example.chandra.getconnected.constants.GetConnectedConstants;
+import com.example.chandra.getconnected.constants.ParseConstants;
+import com.example.chandra.getconnected.utility.ActivityUtility;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
-import com.parse.SignUpCallback;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;

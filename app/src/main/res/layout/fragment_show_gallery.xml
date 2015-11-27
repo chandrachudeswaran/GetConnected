@@ -5,6 +5,15 @@
     tools:context="com.example.chandra.getconnected.ShowGallery">
 
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/owner"
+        android:layout_marginBottom="20dp"
+        android:textColor="@color/md_red_900"
+        android:text="Owned Albums"
+        android:gravity="center"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"/>
     <ListView
         android:id="@+id/gallerylistview"
         android:layout_width="match_parent"
@@ -12,6 +21,6 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="25dp" />
 
 </FrameLayout>

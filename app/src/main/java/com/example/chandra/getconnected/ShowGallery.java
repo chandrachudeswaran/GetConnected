@@ -3,7 +3,6 @@ package com.example.chandra.getconnected;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
@@ -15,11 +14,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.example.chandra.getconnected.com.example.chandra.getconnected.albums.Album;
-import com.example.chandra.getconnected.com.example.chandra.getconnected.albums.AlbumAdapter;
-import com.example.chandra.getconnected.com.example.chandra.getconnected.albums.GetPhotos;
+import com.example.chandra.getconnected.albums.Album;
+import com.example.chandra.getconnected.albums.AlbumAdapter;
+import com.example.chandra.getconnected.constants.ParseConstants;
+import com.example.chandra.getconnected.utility.ActivityUtility;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.parse.FindCallback;

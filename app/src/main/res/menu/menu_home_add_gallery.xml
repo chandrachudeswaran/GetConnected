@@ -3,20 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
     <item
-        android:id="@+id/pic"
+        android:id="@+id/toggle"
+        android:icon="@drawable/ic_autorenew_white_24dp"
         android:orderInCategory="100"
-        android:icon="@drawable/male_profile"
-        android:title="Profile"
-        android:actionViewClass="android.widget.ImageView"
+        android:title="Show Shared"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/addalbum"
-        android:icon="@drawable/gallery"
+        android:icon="@drawable/plus"
         android:orderInCategory="100"
         android:title="CreateAlbum"
         android:onClick="createAlbum"
         app:showAsAction="ifRoom" />
-
 
 
     <item
