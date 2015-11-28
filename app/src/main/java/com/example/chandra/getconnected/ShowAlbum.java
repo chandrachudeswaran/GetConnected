@@ -26,7 +26,6 @@ import java.util.ArrayList;
 
 public class ShowAlbum extends AppCompatActivity {
     private Toolbar mToolbar;
-    ParseObject album;
     TextView title;
     TextView hint;
     GridView grid;

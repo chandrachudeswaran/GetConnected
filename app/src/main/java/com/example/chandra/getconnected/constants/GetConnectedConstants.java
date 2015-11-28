@@ -42,4 +42,6 @@ public class GetConnectedConstants {
     public static final String ALBUM_VIEW = "Album view";
     public static final String PHOTO_VIEW = "Photo view";
 
+    public static final String NO_INTERNET="No Network found.Please swicth on Data";
+
 }

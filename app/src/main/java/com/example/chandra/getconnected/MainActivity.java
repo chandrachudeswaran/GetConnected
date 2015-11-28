@@ -68,73 +68,81 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        try {
-            Parse.enableLocalDatastore(this);
-            Parse.initialize(this, GetConnectedConstants.PARSE_APPLICATION_ID, GetConnectedConstants.PARSE_CLIENT_KEY);
-            ParseFacebookUtils.initialize(this);
-            FacebookSdk.sdkInitialize(getApplicationContext());
-            ParseTwitterUtils.initialize(GetConnectedConstants.TWITTER_CONSUMER_KEY, GetConnectedConstants.TWITTER_SECRET_KEY);
-            TwitterAuthConfig authConfig = new TwitterAuthConfig(GetConnectedConstants.TWITTER_CONSUMER_KEY, GetConnectedConstants.TWITTER_SECRET_KEY);
-            Fabric.with(this, new TwitterCore(authConfig));
+        if (ActivityUtility.Helper.isConnected(MainActivity.this)) {
+            try {
+                Parse.enableLocalDatastore(this);
+                Parse.initialize(this, GetConnectedConstants.PARSE_APPLICATION_ID, GetConnectedConstants.PARSE_CLIENT_KEY);
+                ParseFacebookUtils.initialize(this);
+                FacebookSdk.sdkInitialize(getApplicationContext());
+                ParseTwitterUtils.initialize(GetConnectedConstants.TWITTER_CONSUMER_KEY, GetConnectedConstants.TWITTER_SECRET_KEY);
+                TwitterAuthConfig authConfig = new TwitterAuthConfig(GetConnectedConstants.TWITTER_CONSUMER_KEY, GetConnectedConstants.TWITTER_SECRET_KEY);
+                Fabric.with(this, new TwitterCore(authConfig));
 
-        } catch (Exception e) {
-        }
+            } catch (Exception e) {
+            }
 
 
-        setContentView(R.layout.activity_main);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
-        email_edit = (EditText) findViewById(R.id.username);
-        password_edit = (EditText) findViewById(R.id.password);
-        tweets = (TwitterLoginButton) findViewById(R.id.submit_twittert);
-        ParseUser user = ParseUser.getCurrentUser();
-        if (user != null) {
-            showHome();
-        }
+            setContentView(R.layout.activity_main);
+            mToolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(mToolbar);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+            email_edit = (EditText) findViewById(R.id.username);
+            password_edit = (EditText) findViewById(R.id.password);
+            tweets = (TwitterLoginButton) findViewById(R.id.submit_twittert);
+            ParseUser user = ParseUser.getCurrentUser();
+            if (user != null) {
+                showHome();
+            }
 
-        tweets.setCallback(new Callback<TwitterSession>() {
-            @Override
-            public void success(Result<TwitterSession> result) {
-                ParseTwitterUtils.logIn(MainActivity.this, new LogInCallback() {
-                    @Override
-                    public void done(ParseUser user, ParseException e) {
-                        if (user == null) {
-                            ActivityUtility.Helper.writeErrorLog(e.toString());
-                        } else if (user.isNew()) {
-                            new TwitterLogin().execute(GetConnectedConstants.TWITTER_API_CALL_USER + ParseTwitterUtils.getTwitter().getUserId());
-                        } else {
-                            new TwitterLogin().execute(GetConnectedConstants.TWITTER_API_CALL_USER + ParseTwitterUtils.getTwitter().getUserId());
+            tweets.setCallback(new Callback<TwitterSession>() {
+                @Override
+                public void success(Result<TwitterSession> result) {
+                    ParseTwitterUtils.logIn(MainActivity.this, new LogInCallback() {
+                        @Override
+                        public void done(ParseUser user, ParseException e) {
+                            if (user == null) {
+                                ActivityUtility.Helper.writeErrorLog(e.toString());
+                            } else if (user.isNew()) {
+                                new TwitterLogin().execute(GetConnectedConstants.TWITTER_API_CALL_USER + ParseTwitterUtils.getTwitter().getUserId());
+                            } else {
+                                new TwitterLogin().execute(GetConnectedConstants.TWITTER_API_CALL_USER + ParseTwitterUtils.getTwitter().getUserId());
+                            }
                         }
-                    }
-                });
-            }
-
-            @Override
-            public void failure(TwitterException e) {
-                ActivityUtility.Helper.writeErrorLog(e.toString());
-            }
-        });
-
-    }
-
-
-    public void doFacebookLogin(View v) {
-        ParseFacebookUtils.logInWithReadPermissionsInBackground(MainActivity.this, facebook_Permissions, new LogInCallback() {
-            @Override
-            public void done(ParseUser parseUser, ParseException e) {
-                if (parseUser == null) {
-                    ActivityUtility.Helper.writeErrorLog(e.toString());
-
-                } else if (parseUser.isNew()) {
-                    getUserDetailsFromFB();
-                } else {
-                    showHome();
+                    });
                 }
 
-            }
-        });
+                @Override
+                public void failure(TwitterException e) {
+                    ActivityUtility.Helper.writeErrorLog(e.toString());
+                }
+            });
+
+        } else {
+            ActivityUtility.Helper.showOfflineToastMessage(MainActivity.this);
+        }
+    }
+
+    public void doFacebookLogin(View v) {
+        if (ActivityUtility.Helper.isConnected(MainActivity.this)) {
+            ParseFacebookUtils.logInWithReadPermissionsInBackground(MainActivity.this, facebook_Permissions, new LogInCallback() {
+                @Override
+                public void done(ParseUser parseUser, ParseException e) {
+                    if (parseUser == null) {
+                        ActivityUtility.Helper.writeErrorLog(e.toString());
+
+                    } else if (parseUser.isNew()) {
+                        getUserDetailsFromFB();
+                    } else {
+                        showHome();
+                    }
+
+                }
+            });
+        }
+        else{
+            ActivityUtility.Helper.showOfflineToastMessage(MainActivity.this);
+        }
     }
 
     @Override
@@ -143,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case 100:
                 if (resultCode == RESULT_OK) {
-                    if(ParseUser.getCurrentUser()!=null){
+                    if (ParseUser.getCurrentUser() != null) {
                         finish();
                     }
                 }
@@ -243,22 +251,26 @@ public class MainActivity extends AppCompatActivity {
 
     public void doLogin(View v) {
 
-        if (email_edit.getText().length() == 0 || password_edit.getText().length() == 0) {
-            ActivityUtility.Helper.makeToast(MainActivity.this, GetConnectedConstants.MANDATORY_FIELDS_MISSING);
-            return;
-        } else {
-            ParseUser.logInInBackground(email_edit.getText().toString(), password_edit.getText().toString(), new LogInCallback() {
-                @Override
-                public void done(ParseUser user, ParseException e) {
+        if(ActivityUtility.Helper.isConnected(MainActivity.this)) {
+            if (email_edit.getText().length() == 0 || password_edit.getText().length() == 0) {
+                ActivityUtility.Helper.makeToast(MainActivity.this, GetConnectedConstants.MANDATORY_FIELDS_MISSING);
+                return;
+            } else {
+                ParseUser.logInInBackground(email_edit.getText().toString(), password_edit.getText().toString(), new LogInCallback() {
+                    @Override
+                    public void done(ParseUser user, ParseException e) {
 
-                    if (e == null) {
-                        showHome();
-                    } else {
-                        ActivityUtility.Helper.makeToast(MainActivity.this, "Login Failed");
-                        ActivityUtility.Helper.writeErrorLog(e.toString());
+                        if (e == null) {
+                            showHome();
+                        } else {
+                            ActivityUtility.Helper.makeToast(MainActivity.this, "Login Failed");
+                            ActivityUtility.Helper.writeErrorLog(e.toString());
+                        }
                     }
-                }
-            });
+                });
+            }
+        }else{
+            ActivityUtility.Helper.showOfflineToastMessage(MainActivity.this);
         }
     }
 
