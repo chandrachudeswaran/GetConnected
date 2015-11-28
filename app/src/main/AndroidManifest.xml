@@ -61,6 +61,10 @@
             android:name=".ShowAlbum"
             android:label="@string/title_activity_show_album" >
         </activity>
+        <activity
+            android:name=".PhotoView"
+            android:label="@string/title_activity_photo_view" >
+        </activity>
     </application>
 
 </manifest>

@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import com.example.chandra.getconnected.utility.ActivityUtility;
 import com.example.chandra.getconnected.constants.ParseConstants;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -26,23 +27,17 @@ public class GetPhotos {
     Context context;
     ParseObject album;
     ParseFile file;
-    ArrayList<Bitmap> list;
+    ArrayList<Photo> list;
     ImageList imageList;
 
-    public GetPhotos(Context context, ParseObject album, ImageList imageList, boolean existing) {
+    public GetPhotos(Context context, ParseObject album, ImageList imageList) {
         this.context = context;
         this.album = album;
         this.imageList = imageList;
         list = new ArrayList<>();
 
-
-        if (existing) {
-            displayDialog();
-            query();
-        }
-        else{
-            imageList.sendImages(list);
-        }
+        displayDialog();
+        photo_exists();
 
     }
 
@@ -53,6 +48,21 @@ public class GetPhotos {
         dialog.show();
     }
 
+    public void photo_exists(){
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.PHOTO_TABLE);
+        query.whereEqualTo(ParseConstants.PHOTO_ALBUM, album);
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                if(e==null){
+                  query();
+                }else{
+                    setImage();
+                }
+            }
+        });
+    }
+
     public void query() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.PHOTO_TABLE);
         query.whereEqualTo(ParseConstants.PHOTO_ALBUM, album);
@@ -61,11 +71,15 @@ public class GetPhotos {
                                    public void done(List<ParseObject> objects, ParseException e) {
                                        if (e == null) {
                                            for (ParseObject parseObject : objects) {
+                                               final Photo photo = new Photo();
+                                               photo.setObjectId(parseObject.getObjectId());
+                                               photo.setTitle(parseObject.getString(ParseConstants.PHOTO_CAPTION));
                                                file = parseObject.getParseFile(ParseConstants.PHOTO_FIELD_FILE);
                                                file.getDataInBackground(new GetDataCallback() {
                                                    @Override
                                                    public void done(byte[] data, ParseException e) {
-                                                       list.add(BitmapFactory.decodeByteArray(data, 0, data.length));
+                                                       photo.setImage(BitmapFactory.decodeByteArray(data, 0, data.length));
+                                                       list.add(photo);
                                                        setImage();
 
 
@@ -90,7 +104,7 @@ public class GetPhotos {
     }
 
     public interface ImageList {
-        public void sendImages(ArrayList<Bitmap> images);
+        public void sendImages(ArrayList<Photo> images);
     }
 
 

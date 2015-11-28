@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.example.chandra.getconnected.albums.GetPhotos;
 import com.example.chandra.getconnected.albums.ImageListImpl;
 import com.example.chandra.getconnected.albums.PhotoAdapter;
+import com.example.chandra.getconnected.albums.PhotosImpl;
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
 import com.example.chandra.getconnected.constants.ParseConstants;
 import com.parse.GetCallback;
@@ -30,6 +31,7 @@ public class CreatePhotoWithAlbum extends AppCompatActivity {
     TextView title;
     TextView message;
     boolean condition;
+    PhotosImpl photosImpl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +45,9 @@ public class CreatePhotoWithAlbum extends AppCompatActivity {
         title = (TextView) findViewById(R.id.albumtitle);
         message = (TextView) findViewById(R.id.hint);
         album_id = getIntent().getExtras().getString(ParseConstants.ALBUM_TABLE);
-        condition = getIntent().getExtras().getBoolean(GetConnectedConstants.EXISTING_ALBUM);
-        queryForPhotos(condition);
+
+        photosImpl = new PhotosImpl();
+        queryForPhotos();
 
     }
 
@@ -71,28 +74,16 @@ public class CreatePhotoWithAlbum extends AppCompatActivity {
     }
 
 
-    public void queryForPhotos(final boolean existing) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.ALBUM_TABLE);
-        query.whereEqualTo("objectId", album_id);
-        query.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject object, ParseException e) {
-                if (e == null) {
-                    album = object;
-                    title.setText(object.getString(ParseConstants.ALBUM_FIELD_TITLE));
-                }
+    public void queryForPhotos() {
+        photosImpl.queryForPhotos(album_id,title,CreatePhotoWithAlbum.this,new ImageListImpl(message,grid,R.layout.grid_photos,CreatePhotoWithAlbum.this));
 
-                new GetPhotos(CreatePhotoWithAlbum.this, album, new ImageListImpl(message,grid,R.layout.grid_photos,CreatePhotoWithAlbum.this), existing);
-            }
-        });
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 100) {
             if (resultCode == RESULT_OK) {
-                queryForPhotos(true);
+                queryForPhotos();
 
             }
         }

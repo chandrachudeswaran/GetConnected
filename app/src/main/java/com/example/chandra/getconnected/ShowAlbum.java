@@ -1,5 +1,6 @@
 package com.example.chandra.getconnected;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.example.chandra.getconnected.albums.GetPhotos;
 import com.example.chandra.getconnected.albums.ImageListImpl;
 import com.example.chandra.getconnected.albums.PhotoAdapter;
+import com.example.chandra.getconnected.albums.PhotosImpl;
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
 import com.example.chandra.getconnected.constants.ParseConstants;
 import com.example.chandra.getconnected.utility.ActivityUtility;
@@ -28,6 +30,8 @@ public class ShowAlbum extends AppCompatActivity {
     TextView title;
     TextView hint;
     GridView grid;
+    PhotosImpl photosImpl;
+    String album_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,49 +44,37 @@ public class ShowAlbum extends AppCompatActivity {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        queryForAlbumPhotos(getIntent().getExtras().getString(ParseConstants.ALBUM_TABLE));
-
+        album_id = getIntent().getExtras().getString(ParseConstants.ALBUM_TABLE);
+        photosImpl = new PhotosImpl();
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_show_album, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.addphotos) {
+            Intent intent = new Intent(ShowAlbum.this,AddPhotos.class);
+            intent.putExtra(ParseConstants.ALBUM_TABLE,album_id);
+            startActivity(intent);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-
-    public void queryForAlbumPhotos(String objectId) {
-
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.ALBUM_TABLE);
-        query.whereEqualTo("objectId", objectId);
-        query.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject object, ParseException e) {
-                if (e == null) {
-                    album = object;
-                    title.setText(object.getString(ParseConstants.ALBUM_FIELD_TITLE));
-                }
-                new GetPhotos(ShowAlbum.this,album, new ImageListImpl(hint,grid,R.layout.grid_photos,ShowAlbum.this), true);
-            }
-        });
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        photosImpl.queryForPhotos(album_id, title, ShowAlbum.this,
+                new ImageListImpl(hint, grid, R.layout.grid_photos, ShowAlbum.this));
     }
 
     @Override

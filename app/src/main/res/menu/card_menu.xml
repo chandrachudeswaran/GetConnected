@@ -9,16 +9,11 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/showphotos"
+        android:id="@+id/editalbum"
         android:orderInCategory="100"
-        android:title="Show Photos"
+        android:title="Edit Album"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/addphotos"
-        android:orderInCategory="100"
-        android:title="Add Photos"
-        app:showAsAction="never" />
 
 
 </menu>

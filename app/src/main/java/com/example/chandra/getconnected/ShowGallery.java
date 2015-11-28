@@ -3,6 +3,7 @@ package com.example.chandra.getconnected;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
@@ -46,6 +47,7 @@ public class ShowGallery extends Fragment {
     ListView listView;
     ParseFile imageParseFile;
     ParseUser user;
+    AlbumAdapter adapter;
 
     public ShowGallery() {
 
@@ -54,7 +56,7 @@ public class ShowGallery extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        user=ParseUser.getCurrentUser();
+        user = ParseUser.getCurrentUser();
 
         super.onCreate(savedInstanceState);
     }
@@ -93,13 +95,12 @@ public class ShowGallery extends Fragment {
     }
 
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_show_gallery, container, false);
-        listView =(ListView)view.findViewById(R.id.gallerylistview);
+        listView = (ListView) view.findViewById(R.id.gallerylistview);
         return view;
     }
 
@@ -114,8 +115,6 @@ public class ShowGallery extends Fragment {
             throw new ClassCastException();
         }
     }
-
-
 
 
     public interface OnCreateAlbum {
@@ -142,7 +141,7 @@ public class ShowGallery extends Fragment {
             public void done(List<ParseObject> objects, ParseException e) {
                 if (e == null) {
                     parseAlbums = objects;
-                    for (ParseObject obj : objects) {
+                    for (final ParseObject obj : objects) {
                         final Album album = new Album();
                         album.setTitle(obj.getString(ParseConstants.ALBUM_FIELD_TITLE));
                         album.setIsPublic(obj.getBoolean(ParseConstants.ALBUM_FIELD_ISPUBLIC));
@@ -159,12 +158,21 @@ public class ShowGallery extends Fragment {
                                         public void done(byte[] data, ParseException e) {
                                             album.setAlbum_image(BitmapFactory.decodeByteArray(data, 0, data.length));
                                             albumList.add(album);
-                                            AlbumAdapter adapter = new AlbumAdapter(context, R.layout.gallerylistrow, albumList);
+                                            adapter = new AlbumAdapter(context, R.layout.gallerylistrow, albumList);
                                             listView.setAdapter(adapter);
                                             adapter.setNotifyOnChange(true);
+
                                         }
                                     });
+                                } else {
+                                    album.setAlbum_image(BitmapFactory.decodeResource(context.getResources(),
+                                            R.drawable.no_image));
+                                    albumList.add(album);
+                                    adapter = new AlbumAdapter(context, R.layout.gallerylistrow, albumList);
+                                    listView.setAdapter(adapter);
+                                    adapter.setNotifyOnChange(true);
                                 }
+
                             }
                         });
 

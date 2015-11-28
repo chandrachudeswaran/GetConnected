@@ -56,7 +56,6 @@ public class AlbumActivity extends AppCompatActivity {
                         ActivityUtility.Helper.makeToast(AlbumActivity.this, album_title.getText().toString() + "  " + "album Created");
                         Intent intent = new Intent(AlbumActivity.this, CreatePhotoWithAlbum.class);
                         intent.putExtra(ParseConstants.ALBUM_TABLE, album.getObjectId());
-                        intent.putExtra(GetConnectedConstants.EXISTING_ALBUM,false);
                         startActivity(intent);
                         finish();
                     } else {

@@ -30,7 +30,7 @@ public class ImageListImpl implements GetPhotos.ImageList {
     }
 
     @Override
-    public void sendImages(ArrayList<Bitmap> images) {
+    public void sendImages(ArrayList<Photo> images) {
 
         if (images.isEmpty()) {
 

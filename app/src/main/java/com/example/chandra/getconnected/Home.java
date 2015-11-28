@@ -130,11 +130,7 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
     }
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        ActivityUtility.Helper.writeErrorLog("Resume" + " " + "Home");
-    }
+
 
     @Override
     public void doFinish() {

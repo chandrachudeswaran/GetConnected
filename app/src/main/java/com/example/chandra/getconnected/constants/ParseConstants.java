@@ -5,6 +5,7 @@ package com.example.chandra.getconnected.constants;
  */
 public class ParseConstants {
 
+    public static final String OBJECT_ID="objectId";
     //Album Fields
     public static final String ALBUM_TABLE="Album";
     public static final String ALBUM_FIELD_TITLE="Title";
