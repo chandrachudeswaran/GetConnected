@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/owner"
         android:layout_marginBottom="20dp"
-        android:textColor="@color/md_red_900"
+        android:textColor="@color/colorPrimaryDark"
         android:text="Owned Albums"
         android:gravity="center"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"/>

@@ -1,6 +1,8 @@
 package com.example.chandra.getconnected;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -32,6 +34,7 @@ import com.parse.SignUpCallback;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Signup extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener {
@@ -49,6 +52,10 @@ public class Signup extends AppCompatActivity implements RadioGroup.OnCheckedCha
     Bitmap picture;
     ParseFile imageParseFile;
     ProgressDialog dialog;
+    String gender;
+    ArrayList<Integer> privacy_settings;
+    boolean user_listed = false;
+    boolean receive_push = false;
 
 
     @Override
@@ -76,7 +83,6 @@ public class Signup extends AppCompatActivity implements RadioGroup.OnCheckedCha
         if (!doValidation()) {
             saveInParseSignup();
         }
-
     }
 
     public void uploadImage(View v) {
@@ -148,17 +154,28 @@ public class Signup extends AppCompatActivity implements RadioGroup.OnCheckedCha
 
     public void saveInParseSignup() {
 
-        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        picture.compress(Bitmap.CompressFormat.PNG, 50, stream);
-        byte[] image = stream.toByteArray();
-        imageParseFile = new ParseFile("thumbnail.png", image);
-        new Upload().execute(imageParseFile);
+        if (gender_group.getCheckedRadioButtonId() == R.id.male) {
+            gender = GetConnectedConstants.MALE;
+        } else {
+            gender = GetConnectedConstants.FEMALE;
+        }
+
+        if (picture == null) {
+            if (gender.equals(GetConnectedConstants.MALE)) {
+                picture = BitmapFactory.decodeResource(Signup.this.getResources(),
+                        R.drawable.male_profile);
+            } else {
+                picture = BitmapFactory.decodeResource(Signup.this.getResources(),
+                        R.drawable.female_profile);
+            }
+        }
+        displayAlert();
+
 
     }
 
 
-
-    private class DoSignup extends AsyncTask<ParseUser ,Void,Integer >{
+    private class DoSignup extends AsyncTask<ParseUser, Void, Integer> {
         @Override
         protected Integer doInBackground(final ParseUser... params) {
             params[0].signUpInBackground(new SignUpCallback() {
@@ -168,6 +185,7 @@ public class Signup extends AppCompatActivity implements RadioGroup.OnCheckedCha
                         ActivityUtility.Helper.showNotificationLogin(coordinatorLayout, GetConnectedConstants.NEW_USER_MESSAGE + " " + params[0].getString(GetConnectedConstants.USER_FIRST_NAME));
                         Intent intent = new Intent(Signup.this, Home.class);
                         startActivity(intent);
+                        finish();
                     } else {
                         ActivityUtility.Helper.writeErrorLog(e.toString());
                         ActivityUtility.Helper.makeToast(Signup.this, "Signup failed");
@@ -179,7 +197,6 @@ public class Signup extends AppCompatActivity implements RadioGroup.OnCheckedCha
         }
 
 
-
         @Override
         protected void onPostExecute(Integer i) {
             super.onPostExecute(i);
@@ -188,7 +205,7 @@ public class Signup extends AppCompatActivity implements RadioGroup.OnCheckedCha
     }
 
 
-    private class Upload extends AsyncTask<ParseFile ,Void,Integer >{
+    private class Upload extends AsyncTask<ParseFile, Void, Integer> {
         @Override
         protected Integer doInBackground(final ParseFile... params) {
             params[0].saveInBackground(new SaveCallback() {
@@ -201,6 +218,9 @@ public class Signup extends AppCompatActivity implements RadioGroup.OnCheckedCha
                         user.setPassword(password.getText().toString());
                         user.put(GetConnectedConstants.USER_FIRST_NAME, first_name.getText().toString());
                         user.put(GetConnectedConstants.USER_LAST_NAME, last_name.getText().toString());
+                        user.put(GetConnectedConstants.USER_GENDER, gender);
+                        user.put(GetConnectedConstants.USER_RECEIVE_PUSH, receive_push);
+                        user.put(GetConnectedConstants.USER_LISTED, user_listed);
                         user.put(GetConnectedConstants.USER_PICTURE, imageParseFile);
                         new DoSignup().execute(user);
                     }
@@ -228,7 +248,7 @@ public class Signup extends AppCompatActivity implements RadioGroup.OnCheckedCha
         }
     }
 
-    public void intialize(){
+    public void intialize() {
         try {
             Parse.enableLocalDatastore(this);
             Parse.initialize(this, GetConnectedConstants.PARSE_APPLICATION_ID, GetConnectedConstants.PARSE_CLIENT_KEY);
@@ -250,6 +270,51 @@ public class Signup extends AppCompatActivity implements RadioGroup.OnCheckedCha
         gender_group = (RadioGroup) findViewById(R.id.genderGroup);
         gender_group.setOnCheckedChangeListener(this);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+        privacy_settings = new ArrayList<>();
+    }
+
+
+    public void displayAlert() {
+        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        picture.compress(Bitmap.CompressFormat.PNG, 0, stream);
+        byte[] image = stream.toByteArray();
+        imageParseFile = new ParseFile("thumbnail.png", image);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(Signup.this);
+        builder.setTitle("User Preference Settings")
+                .setCancelable(false)
+                .setMultiChoiceItems(GetConnectedConstants.PRIVACY_SETTINGS, null, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        if (isChecked) {
+                            privacy_settings.add(which);
+                        } else {
+                            privacy_settings.add(which);
+                        }
+                    }
+                }).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                populatePrivacySettings();
+            }
+        });
+        builder.create().show();
+    }
+
+
+    public void populatePrivacySettings() {
+
+        for (Integer i : privacy_settings) {
+            if (i == 0) {
+                user_listed = true;
+            }
+            if (i == 1) {
+                receive_push = true;
+            }
+        }
+
+
+        new Upload().execute(imageParseFile);
     }
 
 }

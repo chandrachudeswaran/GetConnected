@@ -211,6 +211,7 @@ public class MainActivity extends AppCompatActivity {
     public void doSignup(View v) {
         Intent intent = new Intent(MainActivity.this, Signup.class);
         startActivity(intent);
+        finish();
     }
 
     private class TwitterLogin extends AsyncTask<String, Void, String> {

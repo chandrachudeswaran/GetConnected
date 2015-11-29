@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
-        android:textColor="@color/md_red_900" />
+        android:textColor="@color/colorPrimaryDark" />
 
     <TextView
         android:id="@+id/hint"

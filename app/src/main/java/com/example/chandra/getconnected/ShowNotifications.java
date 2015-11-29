@@ -36,6 +36,7 @@ public class ShowNotifications extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_show_notifications, container, false);
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
@@ -55,19 +56,24 @@ public class ShowNotifications extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.logout) {
-            if (user.get("authData").toString().contains("twitter")) {
-                ParseUser.logOut();
-            }
-            if (user.get("authData").toString().contains("facebook")) {
-                AccessToken accessToken = AccessToken.getCurrentAccessToken();
-                if (accessToken != null) {
-                    LoginManager.getInstance().logOut();
+            if (user.get("authData") != null) {
+                if (user.get("authData").toString().contains("twitter")) {
+                    ParseUser.logOut();
                 }
-                ParseUser.logOut();
-                onCreateNotifications.doFinish();
+                if (user.get("authData").toString().contains("facebook")) {
+                    AccessToken accessToken = AccessToken.getCurrentAccessToken();
+                    if (accessToken != null) {
+                        LoginManager.getInstance().logOut();
+                    }
+                    ParseUser.logOut();
+                    onCreateNotifications.doFinish();
 
+                } else {
+
+                    ParseUser.logOut();
+                    onCreateNotifications.doFinish();
+                }
             } else {
-
                 ParseUser.logOut();
                 onCreateNotifications.doFinish();
             }

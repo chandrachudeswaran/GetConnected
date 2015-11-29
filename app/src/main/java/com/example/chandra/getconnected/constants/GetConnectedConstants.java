@@ -30,6 +30,12 @@ public class GetConnectedConstants {
     public static final String USER_FIRST_NAME = "firstname";
     public static final String USER_LAST_NAME = "lastname";
     public static final String USER_PICTURE = "profile_pic";
+    public static final String USER_GENDER = "gender";
+    public static final String USER_LISTED = "userlisted";
+    public static final String USER_RECEIVE_PUSH = "receivepush";
+
+    public static final String MALE = "Male";
+    public static final String FEMALE = "Female";
 
     public static final int SELECT_PHOTO = 100;
     public static final String TWITTER_INTENT_EXTRA = "Twitter";
@@ -42,6 +48,8 @@ public class GetConnectedConstants {
     public static final String ALBUM_VIEW = "Album view";
     public static final String PHOTO_VIEW = "Photo view";
 
-    public static final String NO_INTERNET="No Network found.Please swicth on Data";
+    public static final String NO_INTERNET = "No Network found.Please swicth on Data";
+
+    public static final CharSequence[] PRIVACY_SETTINGS = {"Listed User", "Receive Push Notifications"};
 
 }

@@ -57,19 +57,24 @@ public class ShowMessages extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.logout) {
-            if (user.get("authData").toString().contains("twitter")) {
-                ParseUser.logOut();
-            }
-            if (user.get("authData").toString().contains("facebook")) {
-                AccessToken accessToken = AccessToken.getCurrentAccessToken();
-                if (accessToken != null) {
-                    LoginManager.getInstance().logOut();
+            if (user.get("authData") != null) {
+                if (user.get("authData").toString().contains("twitter")) {
+                    ParseUser.logOut();
                 }
-                ParseUser.logOut();
-                onCreateMessages.doFinish();
+                if (user.get("authData").toString().contains("facebook")) {
+                    AccessToken accessToken = AccessToken.getCurrentAccessToken();
+                    if (accessToken != null) {
+                        LoginManager.getInstance().logOut();
+                    }
+                    ParseUser.logOut();
+                    onCreateMessages.doFinish();
 
+                } else {
+
+                    ParseUser.logOut();
+                    onCreateMessages.doFinish();
+                }
             } else {
-
                 ParseUser.logOut();
                 onCreateMessages.doFinish();
             }

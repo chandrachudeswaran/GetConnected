@@ -12,7 +12,10 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.example.chandra.getconnected.albums.AlbumAdapter;
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
+import com.example.chandra.getconnected.constants.ParseConstants;
+import com.example.chandra.getconnected.users.UserAdapter;
 import com.example.chandra.getconnected.utility.ActivityUtility;
 import com.facebook.FacebookSdk;
 
@@ -28,12 +31,14 @@ import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
 
-public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum,ShowUsers.OnCreateUsers,ShowMessages.OnCreateMessages,ShowNotifications.OnCreateNotifications{
+public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum, ShowUsers.OnCreateUsers,
+        ShowMessages.OnCreateMessages, ShowNotifications.OnCreateNotifications, AlbumAdapter.IAlbumAdapter, UserAdapter.IUserAdapter {
     private Toolbar mToolbar;
     private CoordinatorLayout coordinatorLayout;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     ParseUser user;
+    ShowGallery gallery;
 
 
     @Override
@@ -57,7 +62,7 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-
+        gallery = new ShowGallery();
         user = ParseUser.getCurrentUser();
 
         if (user.getString(GetConnectedConstants.USER_FIRST_NAME) == null) {
@@ -86,7 +91,7 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
         adapter.addFragment(new ShowUsers(), "Users");
         adapter.addFragment(new ShowMessages(), "Messages");
         adapter.addFragment(new ShowNotifications(), "Notifications");
-        adapter.addFragment(new ShowGallery(), "Gallery");
+        adapter.addFragment(gallery, "Gallery");
         viewPager.setAdapter(adapter);
 
     }
@@ -130,22 +135,61 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
     }
 
 
-
-
     @Override
     public void doFinish() {
         finish();
     }
 
-    public void doCreateAlbum(){
-        Intent intent = new Intent(Home.this,AlbumActivity.class);
-        startActivity(intent);
+    public void doCreateAlbum() {
+        Intent intent = new Intent(Home.this, AlbumActivity.class);
+        startActivityForResult(intent, 100);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case 100:
+                if (resultCode == RESULT_OK) {
+                    String id = data.getExtras().getString(ParseConstants.ALBUM_TABLE);
+                    Intent intent = new Intent(Home.this, CreatePhotoWithAlbum.class);
+                    intent.putExtra(ParseConstants.ALBUM_TABLE, id);
+                    startActivityForResult(intent, 500);
+
+                }
+                break;
+            case 200:
+                if (resultCode == RESULT_OK) {
+                    gallery.queryAlbum();
+                }
+                break;
+            case 500:
+                if (resultCode == RESULT_OK) {
+                    gallery.queryAlbum();
+                }
+        }
+
     }
 
     @Override
     public void onBackPressed() {
         Intent intent = new Intent();
-        setResult(RESULT_OK,intent);
+        setResult(RESULT_OK, intent);
         finish();
+    }
+
+    @Override
+    public void callEditAlbumIntent(String ObjectId) {
+        Intent intent = new Intent(Home.this, AlbumActivity.class);
+        intent.putExtra(ParseConstants.OBJECT_ID, ObjectId);
+        startActivityForResult(intent, 200);
+    }
+
+
+    @Override
+    public void callProfileView(String objectId) {
+        Intent intent = new Intent(Home.this, ProfileView.class);
+        intent.putExtra(ParseConstants.OBJECT_ID, objectId);
+        startActivity(intent);
     }
 }

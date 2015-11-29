@@ -57,7 +57,7 @@ public class ShowGallery extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         user = ParseUser.getCurrentUser();
-
+        queryAlbum();
         super.onCreate(savedInstanceState);
     }
 
@@ -73,19 +73,24 @@ public class ShowGallery extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.logout) {
-            if (user.get("authData").toString().contains("twitter")) {
-                ParseUser.logOut();
-            }
-            if (user.get("authData").toString().contains("facebook")) {
-                AccessToken accessToken = AccessToken.getCurrentAccessToken();
-                if (accessToken != null) {
-                    LoginManager.getInstance().logOut();
+            if (user.get("authData") != null) {
+                if (user.get("authData").toString().contains("twitter")) {
+                    ParseUser.logOut();
                 }
-                ParseUser.logOut();
-                onCreateAlbum.doFinish();
+                if (user.get("authData").toString().contains("facebook")) {
+                    AccessToken accessToken = AccessToken.getCurrentAccessToken();
+                    if (accessToken != null) {
+                        LoginManager.getInstance().logOut();
+                    }
+                    ParseUser.logOut();
+                    onCreateAlbum.doFinish();
 
+                } else {
+
+                    ParseUser.logOut();
+                    onCreateAlbum.doFinish();
+                }
             } else {
-
                 ParseUser.logOut();
                 onCreateAlbum.doFinish();
             }
@@ -123,13 +128,18 @@ public class ShowGallery extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        queryAlbum();
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        adapter = new AlbumAdapter(context, R.layout.gallerylistrow, albumList);
+        listView.setAdapter(adapter);
+        adapter.setNotifyOnChange(true);
+    }
 
     public void queryAlbum() {
         albumList = new ArrayList<>();

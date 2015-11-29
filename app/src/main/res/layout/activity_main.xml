@@ -16,26 +16,36 @@
             android:id="@+id/toolbar"
             layout="@layout/toolbar" />
 
-        <EditText
-            android:id="@+id/username"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/text_email"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="30dp"
-            android:background="@drawable/box"
-            android:hint="EMAIL" />
+            android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/password"
+            <EditText
+                android:id="@+id/username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="30dp"
+                android:hint="EMAIL" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/text_password"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/box"
-            android:hint="PASSWORD"
-            android:inputType="textPassword" />
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="10dp"
+                android:hint="PASSWORD"
+                android:inputType="textPassword" />
+        </android.support.design.widget.TextInputLayout>
 
         <Button
             android:id="@+id/login"
@@ -44,9 +54,9 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
-            android:background="@color/md_teal_300"
-            android:text="LOGin"
+            android:background="@color/colorPrimaryDark"
             android:onClick="doLogin"
+            android:text="LOGin"
             android:textColor="#ffffff"
             android:textSize="20dp" />
 
@@ -86,8 +96,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="   Signup."
                 android:onClick="doSignup"
+                android:text="   Signup."
                 android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
         </LinearLayout>
     </LinearLayout>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@color/md_teal_500</color>
-    <color name="colorPrimaryDark">@color/md_teal_700</color>
+    <color name="colorPrimary">#2A3158</color>
+    <color name="colorPrimaryDark">#23294b</color>
     <color name="textColorPrimary">#FFFFFF</color>
     <color name="windowBackground">#FFFFFF</color>
     <color name="navigationBarColor">#000000</color>
-    <color name="colorAccent">#FF80AB</color>
+    <color name="colorAccent">#ff4182</color>
 </resources>

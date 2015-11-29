@@ -38,7 +38,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
-        android:background="@color/md_teal_300"
+        android:background="@color/colorPrimaryDark"
         android:text="Upload Photo"
         android:onClick="onSubmit"
         android:textColor="#ffffff"

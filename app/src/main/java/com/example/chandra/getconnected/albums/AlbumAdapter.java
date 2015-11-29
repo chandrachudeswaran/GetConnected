@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.chandra.getconnected.AlbumActivity;
 import com.example.chandra.getconnected.R;
 import com.example.chandra.getconnected.ShowAlbum;
 import com.example.chandra.getconnected.albums.Album;
@@ -63,6 +64,12 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
                     public boolean onMenuItemClick(MenuItem item) {
                         int id = item.getItemId();
                         if (id == R.id.sharealbum) {
+
+                        }
+
+                        if (id == R.id.editalbum) {
+
+                            ((IAlbumAdapter)context).callEditAlbumIntent(list.get(position).getObjectId());
 
                         }
                         return true;
@@ -205,5 +212,9 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
             }
         });
 
+    }
+
+    public interface IAlbumAdapter{
+        public void callEditAlbumIntent(String objectId);
     }
 }
