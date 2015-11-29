@@ -52,4 +52,6 @@ public class GetConnectedConstants {
 
     public static final CharSequence[] PRIVACY_SETTINGS = {"Listed User", "Receive Push Notifications"};
 
+    public static final String REMOVE_PHOTOS_OPTION = "Add Photos";
+
 }

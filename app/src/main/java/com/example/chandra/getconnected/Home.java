@@ -160,12 +160,12 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
                 break;
             case 200:
                 if (resultCode == RESULT_OK) {
-                    gallery.queryAlbum();
+                    gallery.queryAllAlbumForUser();
                 }
                 break;
             case 500:
                 if (resultCode == RESULT_OK) {
-                    gallery.queryAlbum();
+                    gallery.queryAllAlbumForUser();
                 }
         }
 

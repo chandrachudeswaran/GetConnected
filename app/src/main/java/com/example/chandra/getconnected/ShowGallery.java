@@ -57,7 +57,7 @@ public class ShowGallery extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         user = ParseUser.getCurrentUser();
-        queryAlbum();
+        queryAllAlbumForUser();
         super.onCreate(savedInstanceState);
     }
 
@@ -141,7 +141,7 @@ public class ShowGallery extends Fragment {
         adapter.setNotifyOnChange(true);
     }
 
-    public void queryAlbum() {
+    public void queryAllAlbumForUser() {
         albumList = new ArrayList<>();
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.ALBUM_TABLE);

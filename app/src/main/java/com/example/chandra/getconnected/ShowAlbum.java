@@ -31,6 +31,7 @@ public class ShowAlbum extends AppCompatActivity {
     GridView grid;
     PhotosImpl photosImpl;
     String album_id;
+    boolean remove_photos = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,14 +44,24 @@ public class ShowAlbum extends AppCompatActivity {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        album_id = getIntent().getExtras().getString(ParseConstants.ALBUM_TABLE);
+
+        if (getIntent().getExtras() != null) {
+            album_id = getIntent().getExtras().getString(ParseConstants.ALBUM_TABLE);
+
+            remove_photos = getIntent().getExtras().getBoolean(GetConnectedConstants.REMOVE_PHOTOS_OPTION);
+
+        }
+
         photosImpl = new PhotosImpl();
+
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_show_album, menu);
+        if (!remove_photos) {
+            getMenuInflater().inflate(R.menu.menu_show_album, menu);
+        }
         return true;
     }
 
@@ -60,8 +71,8 @@ public class ShowAlbum extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.addphotos) {
-            Intent intent = new Intent(ShowAlbum.this,AddPhotos.class);
-            intent.putExtra(ParseConstants.ALBUM_TABLE,album_id);
+            Intent intent = new Intent(ShowAlbum.this, AddPhotos.class);
+            intent.putExtra(ParseConstants.ALBUM_TABLE, album_id);
             startActivity(intent);
             return true;
         }

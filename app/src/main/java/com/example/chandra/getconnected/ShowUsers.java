@@ -151,16 +151,25 @@ public class ShowUsers extends Fragment {
                         user.setFirstname(users.getString(GetConnectedConstants.USER_FIRST_NAME));
                         user.setLastname(users.getString(GetConnectedConstants.USER_LAST_NAME));
                         profile_pic_file = users.getParseFile(GetConnectedConstants.USER_PICTURE);
-                        profile_pic_file.getDataInBackground(new GetDataCallback() {
-                            @Override
-                            public void done(byte[] data, ParseException e) {
-                                user.setProfile_pic(BitmapFactory.decodeByteArray(data, 0, data.length));
-                                usersList.add(user);
-                                adapter = new UserAdapter(context, R.layout.user_listrow, usersList);
-                                listview.setAdapter(adapter);
-                                adapter.setNotifyOnChange(true);
-                            }
-                        });
+                        if (profile_pic_file != null) {
+                            profile_pic_file.getDataInBackground(new GetDataCallback() {
+                                @Override
+                                public void done(byte[] data, ParseException e) {
+                                    user.setProfile_pic(BitmapFactory.decodeByteArray(data, 0, data.length));
+                                    usersList.add(user);
+                                    adapter = new UserAdapter(context, R.layout.user_listrow, usersList);
+                                    listview.setAdapter(adapter);
+                                    adapter.setNotifyOnChange(true);
+                                }
+                            });
+                        } else {
+                            user.setProfile_pic(BitmapFactory.decodeResource(context.getResources(),
+                                    R.drawable.no_image));
+                            usersList.add(user);
+                            adapter = new UserAdapter(context, R.layout.user_listrow, usersList);
+                            listview.setAdapter(adapter);
+                            adapter.setNotifyOnChange(true);
+                        }
                     }
                 }
             }

@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 
 import com.example.chandra.getconnected.PhotoView;
@@ -68,6 +70,9 @@ public class PhotoAdapter extends BaseAdapter {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(resource, parent, false);
         }
+
+        LinearLayout layout = (LinearLayout) convertView.findViewById(R.id.parent);
+        layout.removeView(convertView.findViewById(R.id.album_title));
         ImageView imageView = (ImageView) convertView.findViewById(R.id.imageGrid);
         imageView.setImageBitmap(list.get(position).getImage());
         imageView.setOnClickListener(new View.OnClickListener() {
@@ -82,7 +87,7 @@ public class PhotoAdapter extends BaseAdapter {
         imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                displayAlertDialog(position,list.get(position).getObjectId());
+                displayAlertDialog(position, list.get(position).getObjectId());
 
                 return true;
             }
@@ -91,7 +96,7 @@ public class PhotoAdapter extends BaseAdapter {
     }
 
 
-    public void displayAlertDialog(final int position,final String objectId){
+    public void displayAlertDialog(final int position, final String objectId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Delete Photo")
                 .setCancelable(false)
@@ -114,20 +119,20 @@ public class PhotoAdapter extends BaseAdapter {
         builder.create().show();
     }
 
-    public void deletePhotoSelected(String objectId){
+    public void deletePhotoSelected(String objectId) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.PHOTO_TABLE);
-        query.whereEqualTo(ParseConstants.OBJECT_ID,objectId);
+        query.whereEqualTo(ParseConstants.OBJECT_ID, objectId);
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject object, ParseException e) {
-                if(e==null){
+                if (e == null) {
                     try {
                         object.delete();
                         object.saveInBackground();
                     } catch (ParseException e1) {
                         e1.printStackTrace();
                     }
-                }else{
+                } else {
                     ActivityUtility.Helper.writeErrorLog(e.toString());
                 }
             }
