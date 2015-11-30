@@ -7,7 +7,7 @@ import android.os.Parcelable;
 /**
  * Created by chandra on 11/29/2015.
  */
-public class User  {
+public class User {
 
     String firstname;
     String lastname;
@@ -82,9 +82,12 @@ public class User  {
         this.profile_pic = profile_pic;
     }
 
-    public User(){
+    public User() {
 
     }
 
-
+    @Override
+    public String toString() {
+        return firstname + " " + lastname;
+    }
 }

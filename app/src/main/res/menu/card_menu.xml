@@ -14,6 +14,12 @@
         android:title="Edit Album"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/sharingstatus"
+        android:orderInCategory="100"
+        android:title="Shared Users"
+        app:showAsAction="never" />
+
 
 
 </menu>

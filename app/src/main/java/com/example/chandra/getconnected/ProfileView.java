@@ -14,6 +14,7 @@ import com.example.chandra.getconnected.albums.Album;
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
 import com.example.chandra.getconnected.constants.ParseConstants;
 import com.example.chandra.getconnected.users.UserAlbumAdapter;
+import com.example.chandra.getconnected.utility.PhotoUtility;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;
@@ -72,7 +73,7 @@ public class ProfileView extends AppCompatActivity {
                         profile_picture.getDataInBackground(new GetDataCallback() {
                             @Override
                             public void done(byte[] data, ParseException e) {
-                                profile.setImageBitmap(BitmapFactory.decodeByteArray(data, 0, data.length));
+                                profile.setImageBitmap(PhotoUtility.decodeSampledBitmap(data));
                                 queryPublicAlbumsForUser(profile_view_user);
                             }
                         });

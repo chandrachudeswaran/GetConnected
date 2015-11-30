@@ -167,6 +167,11 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
                 if (resultCode == RESULT_OK) {
                     gallery.queryAllAlbumForUser();
                 }
+            case 1000:
+                if (resultCode == RESULT_OK) {
+                    gallery.queryAllAlbumForUser();
+                }
+                break;
         }
 
     }
@@ -191,5 +196,17 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
         Intent intent = new Intent(Home.this, ProfileView.class);
         intent.putExtra(ParseConstants.OBJECT_ID, objectId);
         startActivity(intent);
+    }
+
+    @Override
+    public void callAddPhotosToAlbum(String objectId) {
+        Intent intent = new Intent(Home.this, ShowAlbum.class);
+        intent.putExtra(ParseConstants.ALBUM_TABLE, objectId);
+        startActivityForResult(intent, 1000);
+    }
+
+    @Override
+    public void callNotificationSharingStatus() {
+        ActivityUtility.Helper.showNotificationLogin(coordinatorLayout, "This Album is not shared with anybody");
     }
 }

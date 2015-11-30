@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 
 import com.example.chandra.getconnected.utility.ActivityUtility;
 import com.example.chandra.getconnected.constants.ParseConstants;
+import com.example.chandra.getconnected.utility.PhotoUtility;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;
@@ -78,7 +79,7 @@ public class GetPhotos {
                                                file.getDataInBackground(new GetDataCallback() {
                                                    @Override
                                                    public void done(byte[] data, ParseException e) {
-                                                       photo.setImage(BitmapFactory.decodeByteArray(data, 0, data.length));
+                                                       photo.setImage(PhotoUtility.decodeSampledBitmap(data));
                                                        list.add(photo);
                                                        setImage();
 

@@ -20,6 +20,7 @@ import com.example.chandra.getconnected.albums.Album;
 import com.example.chandra.getconnected.albums.AlbumAdapter;
 import com.example.chandra.getconnected.constants.ParseConstants;
 import com.example.chandra.getconnected.utility.ActivityUtility;
+import com.example.chandra.getconnected.utility.PhotoUtility;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.parse.FindCallback;
@@ -146,6 +147,7 @@ public class ShowGallery extends Fragment {
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.ALBUM_TABLE);
         query.whereEqualTo(ParseConstants.ALBUM_FIELD_OWNER, ParseUser.getCurrentUser());
+        query.orderByAscending(ParseConstants.ALBUM_FIELD_TITLE);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
@@ -166,7 +168,7 @@ public class ShowGallery extends Fragment {
                                     imageParseFile.getDataInBackground(new GetDataCallback() {
                                         @Override
                                         public void done(byte[] data, ParseException e) {
-                                            album.setAlbum_image(BitmapFactory.decodeByteArray(data, 0, data.length));
+                                            album.setAlbum_image(PhotoUtility.decodeSampledBitmap(data));
                                             albumList.add(album);
                                             adapter = new AlbumAdapter(context, R.layout.gallerylistrow, albumList);
                                             listView.setAdapter(adapter);
@@ -178,10 +180,12 @@ public class ShowGallery extends Fragment {
                                     album.setAlbum_image(BitmapFactory.decodeResource(context.getResources(),
                                             R.drawable.no_image));
                                     albumList.add(album);
+
                                     adapter = new AlbumAdapter(context, R.layout.gallerylistrow, albumList);
                                     listView.setAdapter(adapter);
                                     adapter.setNotifyOnChange(true);
                                 }
+
 
                             }
                         });

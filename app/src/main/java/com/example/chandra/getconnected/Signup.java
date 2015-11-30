@@ -289,7 +289,7 @@ public class Signup extends AppCompatActivity implements RadioGroup.OnCheckedCha
                         if (isChecked) {
                             privacy_settings.add(which);
                         } else {
-                            privacy_settings.add(which);
+                            privacy_settings.remove(which);
                         }
                     }
                 }).setPositiveButton("OK", new DialogInterface.OnClickListener() {

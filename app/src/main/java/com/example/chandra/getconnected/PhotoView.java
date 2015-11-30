@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.chandra.getconnected.constants.ParseConstants;
+import com.example.chandra.getconnected.utility.PhotoUtility;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
@@ -70,7 +71,7 @@ public class PhotoView extends AppCompatActivity {
                     imageParseFile.getDataInBackground(new GetDataCallback() {
                         @Override
                         public void done(byte[] data, ParseException e) {
-                            image.setImageBitmap(BitmapFactory.decodeByteArray(data, 0, data.length));
+                            image.setImageBitmap(PhotoUtility.decodeSampledBitmap(data));
 
                         }
                     });

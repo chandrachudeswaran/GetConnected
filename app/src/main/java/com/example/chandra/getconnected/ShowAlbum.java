@@ -53,7 +53,8 @@ public class ShowAlbum extends AppCompatActivity {
         }
 
         photosImpl = new PhotosImpl();
-
+        photosImpl.queryForPhotos(album_id, title, ShowAlbum.this,
+                new ImageListImpl(hint, grid, R.layout.grid_photos, ShowAlbum.this));
 
     }
 
@@ -73,7 +74,7 @@ public class ShowAlbum extends AppCompatActivity {
         if (id == R.id.addphotos) {
             Intent intent = new Intent(ShowAlbum.this, AddPhotos.class);
             intent.putExtra(ParseConstants.ALBUM_TABLE, album_id);
-            startActivity(intent);
+            startActivityForResult(intent, 100);
             return true;
         }
 
@@ -81,14 +82,21 @@ public class ShowAlbum extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        photosImpl.queryForPhotos(album_id, title, ShowAlbum.this,
-                new ImageListImpl(hint, grid, R.layout.grid_photos, ShowAlbum.this));
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case 100:
+                if (resultCode == RESULT_OK) {
+                    photosImpl.queryForPhotos(album_id, title, ShowAlbum.this,
+                            new ImageListImpl(hint, grid, R.layout.grid_photos, ShowAlbum.this));
+                }
+        }
     }
 
     @Override
     public void onBackPressed() {
+        Intent intent = new Intent();
+        setResult(RESULT_OK,intent);
         finish();
     }
 }

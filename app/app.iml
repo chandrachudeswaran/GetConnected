@@ -104,33 +104,33 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 23 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="gson-2.2.4" level="project" />
-    <orderEntry type="library" exported="" name="answers-1.0.1" level="project" />
-    <orderEntry type="library" exported="" name="parsetwitterutils-android-1.10.3" level="project" />
-    <orderEntry type="library" exported="" name="retrofit-1.6.1" level="project" />
-    <orderEntry type="library" exported="" name="picasso-2.3.2" level="project" />
-    <orderEntry type="library" exported="" name="recyclerview-v7-23.0.1" level="project" />
-    <orderEntry type="library" exported="" name="digits-1.0.1" level="project" />
-    <orderEntry type="library" exported="" name="support-v4-23.1.0" level="project" />
-    <orderEntry type="library" exported="" name="bolts-android-1.2.1" level="project" />
-    <orderEntry type="library" exported="" name="appcompat-v7-23.1.0" level="project" />
-    <orderEntry type="library" exported="" name="support-annotations-23.1.0" level="project" />
-    <orderEntry type="library" exported="" name="parse-android-1.10.2" level="project" />
-    <orderEntry type="library" exported="" name="httpclient-4.0.1" level="project" />
-    <orderEntry type="library" exported="" name="httpcore-4.0.1" level="project" />
-    <orderEntry type="library" exported="" name="twitter-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="httpmime-4.0.1" level="project" />
-    <orderEntry type="library" exported="" name="tweet-composer-0.7.1" level="project" />
-    <orderEntry type="library" exported="" name="tweet-ui-1.0.1" level="project" />
-    <orderEntry type="library" exported="" name="cardview-v7-23.0.1" level="project" />
-    <orderEntry type="library" exported="" name="crashlytics-2.0.1" level="project" />
-    <orderEntry type="library" exported="" name="mopub-3.2.2" level="project" />
-    <orderEntry type="library" exported="" name="design-23.0.1" level="project" />
-    <orderEntry type="library" exported="" name="beta-1.0.1" level="project" />
-    <orderEntry type="library" exported="" name="facebook-android-sdk-4.4.0" level="project" />
-    <orderEntry type="library" exported="" name="fabric-1.0.1" level="project" />
-    <orderEntry type="library" exported="" name="twitter-core-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="apache-mime4j-0.6" level="project" />
+    <orderEntry type="library" exported="" name="fabric-1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="picasso-2.5.2" level="project" />
+    <orderEntry type="library" exported="" name="httpclient-4.0.1" level="project" />
     <orderEntry type="library" exported="" name="parsefacebookutils-v4-android-1.10.3" level="project" />
+    <orderEntry type="library" exported="" name="design-23.0.1" level="project" />
+    <orderEntry type="library" exported="" name="parse-android-1.10.2" level="project" />
+    <orderEntry type="library" exported="" name="retrofit-1.6.1" level="project" />
+    <orderEntry type="library" exported="" name="appcompat-v7-23.1.0" level="project" />
+    <orderEntry type="library" exported="" name="crashlytics-2.0.1" level="project" />
+    <orderEntry type="library" exported="" name="digits-1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="tweet-ui-1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="support-annotations-23.1.0" level="project" />
+    <orderEntry type="library" exported="" name="parsetwitterutils-android-1.10.3" level="project" />
+    <orderEntry type="library" exported="" name="gson-2.2.4" level="project" />
+    <orderEntry type="library" exported="" name="bolts-android-1.2.1" level="project" />
+    <orderEntry type="library" exported="" name="mopub-3.2.2" level="project" />
+    <orderEntry type="library" exported="" name="cardview-v7-23.0.1" level="project" />
+    <orderEntry type="library" exported="" name="httpcore-4.0.1" level="project" />
+    <orderEntry type="library" exported="" name="facebook-android-sdk-4.4.0" level="project" />
+    <orderEntry type="library" exported="" name="twitter-core-1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="beta-1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="twitter-1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="tweet-composer-0.7.1" level="project" />
+    <orderEntry type="library" exported="" name="support-v4-23.1.0" level="project" />
+    <orderEntry type="library" exported="" name="answers-1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="recyclerview-v7-23.0.1" level="project" />
   </component>
 </module>

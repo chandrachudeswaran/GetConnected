@@ -22,6 +22,7 @@ import com.example.chandra.getconnected.constants.GetConnectedConstants;
 import com.example.chandra.getconnected.constants.ParseConstants;
 import com.example.chandra.getconnected.users.User;
 import com.example.chandra.getconnected.users.UserAdapter;
+import com.example.chandra.getconnected.utility.PhotoUtility;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.parse.FindCallback;
@@ -155,7 +156,7 @@ public class ShowUsers extends Fragment {
                             profile_pic_file.getDataInBackground(new GetDataCallback() {
                                 @Override
                                 public void done(byte[] data, ParseException e) {
-                                    user.setProfile_pic(BitmapFactory.decodeByteArray(data, 0, data.length));
+                                    user.setProfile_pic(PhotoUtility.decodeSampledBitmap(data));
                                     usersList.add(user);
                                     adapter = new UserAdapter(context, R.layout.user_listrow, usersList);
                                     listview.setAdapter(adapter);
