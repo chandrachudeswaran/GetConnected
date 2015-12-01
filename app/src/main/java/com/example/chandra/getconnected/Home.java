@@ -209,4 +209,9 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
     public void callNotificationSharingStatus() {
         ActivityUtility.Helper.showNotificationLogin(coordinatorLayout, "This Album is not shared with anybody");
     }
+
+    @Override
+    public void callEmptyNotificationSharingAlbum() {
+        ActivityUtility.Helper.showNotificationLogin(coordinatorLayout,"Album is shared with all the public users");
+    }
 }

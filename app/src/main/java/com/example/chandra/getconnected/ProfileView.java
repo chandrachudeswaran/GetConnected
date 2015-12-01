@@ -23,6 +23,7 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,19 +69,24 @@ public class ProfileView extends AppCompatActivity {
                     first_name.setText(object.getString(GetConnectedConstants.USER_FIRST_NAME));
                     last_name.setText(object.getString(GetConnectedConstants.USER_LAST_NAME));
                     gender.setText(object.getString(GetConnectedConstants.USER_GENDER));
-                    profile_picture = object.getParseFile(GetConnectedConstants.USER_PICTURE);
-                    if (profile_picture != null) {
-                        profile_picture.getDataInBackground(new GetDataCallback() {
-                            @Override
-                            public void done(byte[] data, ParseException e) {
-                                profile.setImageBitmap(PhotoUtility.decodeSampledBitmap(data));
-                                queryPublicAlbumsForUser(profile_view_user);
-                            }
-                        });
-                    } else {
-                        profile.setImageBitmap(BitmapFactory.decodeResource(ProfileView.this.getResources(),
-                                R.drawable.no_image));
+                    if (object.getString(GetConnectedConstants.USER_IMAGE_FACEBOOK) != null) {
+                        Picasso.with(ProfileView.this).load(object.getString(GetConnectedConstants.USER_IMAGE_FACEBOOK)).into(profile);
                         queryPublicAlbumsForUser(profile_view_user);
+                    } else {
+                        profile_picture = object.getParseFile(GetConnectedConstants.USER_PICTURE);
+                        if (profile_picture != null) {
+                            profile_picture.getDataInBackground(new GetDataCallback() {
+                                @Override
+                                public void done(byte[] data, ParseException e) {
+                                    profile.setImageBitmap(PhotoUtility.decodeSampledBitmap(data));
+                                    queryPublicAlbumsForUser(profile_view_user);
+                                }
+                            });
+                        } else {
+                            profile.setImageBitmap(BitmapFactory.decodeResource(ProfileView.this.getResources(),
+                                    R.drawable.no_image));
+                            queryPublicAlbumsForUser(profile_view_user);
+                        }
                     }
                 }
             }

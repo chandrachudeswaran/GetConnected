@@ -1,5 +1,8 @@
 package com.example.chandra.getconnected;
 
+import android.app.ProgressDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Intent;
@@ -10,10 +13,12 @@ import android.widget.EditText;
 
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
 import com.example.chandra.getconnected.utility.ActivityUtility;
+import com.example.chandra.getconnected.utility.ParsingUtility;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 
 import android.support.design.widget.CoordinatorLayout;
+import android.widget.ImageView;
 
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -25,6 +30,7 @@ import com.parse.ParseTwitterUtils;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.parse.twitter.Twitter;
+import com.squareup.picasso.Picasso;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterCore;
@@ -42,7 +48,10 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +66,13 @@ public class MainActivity extends AppCompatActivity {
     EditText password_edit;
     String username;
     String email;
+    String first_name;
+    String last_name;
+    String gender;
     TwitterLoginButton tweets;
+    String id;
+    ProgressDialog dialog;
+    String url_facebook;
     public static final List<String> facebook_Permissions = new ArrayList<String>() {{
         add(GetConnectedConstants.FACEBOOK_PERMISSION_PUBLIC);
         add(GetConnectedConstants.FACEBOOK_PERMISSION_FRIENDS);
@@ -139,8 +154,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
-        }
-        else{
+        } else {
             ActivityUtility.Helper.showOfflineToastMessage(MainActivity.this);
         }
     }
@@ -169,7 +183,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
                 try {
-                    username = jsonObject.getString("name");
+                    ActivityUtility.Helper.writeErrorLog("json" + jsonObject.toString());
+                    username = jsonObject.getString("email");
+                    first_name = jsonObject.getString("first_name");
+                    last_name = jsonObject.getString("last_name");
+                    gender = jsonObject.getString("gender");
+                    id=jsonObject.getString("id");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -184,28 +203,15 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "name,email");
+        parameters.putString("fields", "id,name,first_name,last_name,email,link,gender");
         graphRequest.setParameters(parameters);
         graphRequest.executeAsync();
     }
 
     public void saveUserInParse() {
-        ParseUser user = ParseUser.getCurrentUser();
-        user.setUsername(username);
-        String[] names = username.split(" ");
-        user.put(GetConnectedConstants.USER_FIRST_NAME, names[0]);
-        user.put(GetConnectedConstants.USER_LAST_NAME, names[1]);
-        user.setEmail(email);
-        user.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    showHome();
-                } else {
-                    ActivityUtility.Helper.writeErrorLog(e.toString());
-                }
-            }
-        });
+
+        getProfilePictureFromFacebook();
+
     }
 
     public void doSignup(View v) {
@@ -252,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void doLogin(View v) {
 
-        if(ActivityUtility.Helper.isConnected(MainActivity.this)) {
+        if (ActivityUtility.Helper.isConnected(MainActivity.this)) {
             if (email_edit.getText().length() == 0 || password_edit.getText().length() == 0) {
                 ActivityUtility.Helper.makeToast(MainActivity.this, GetConnectedConstants.MANDATORY_FIELDS_MISSING);
                 return;
@@ -270,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
-        }else{
+        } else {
             ActivityUtility.Helper.showOfflineToastMessage(MainActivity.this);
         }
     }
@@ -285,6 +291,73 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         finish();
     }
+
+
+    public void getProfilePictureFromFacebook(){
+
+        new TaskUtil().execute("https://graph.facebook.com/" + id + "/picture?width=250&height=250&redirect=false");
+
+    }
+
+
+    private class TaskUtil extends AsyncTask<String, Void, String > {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                BufferedReader reader = null;
+                String line = "";
+                StringBuilder sb = new StringBuilder();
+                URL url = new URL(params[0]);
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setRequestMethod("GET");
+                reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                return ParsingUtility.FacebookProfilePicture.getProfilePicFromFacebook(new JSONObject(sb.toString()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(String url) {
+            url_facebook = url;
+            ParseUser user = ParseUser.getCurrentUser();
+            user.setUsername(username);
+            user.put(GetConnectedConstants.USER_FIRST_NAME, first_name);
+            user.put(GetConnectedConstants.USER_LAST_NAME, last_name);
+            user.put(GetConnectedConstants.USER_IMAGE_FACEBOOK,url_facebook);
+            if (gender.equalsIgnoreCase("male")) {
+                gender = GetConnectedConstants.MALE;
+            } else {
+                gender = GetConnectedConstants.FEMALE;
+            }
+            user.put(GetConnectedConstants.USER_GENDER, gender);
+            user.setEmail(email);
+            user.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e == null) {
+                        showHome();
+
+                    } else {
+                        ActivityUtility.Helper.writeErrorLog(e.toString());
+                    }
+                }
+            });
+
+
+        }
+
+        }
+
+
 
 
 }

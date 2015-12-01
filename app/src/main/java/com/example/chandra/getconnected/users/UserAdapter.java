@@ -19,6 +19,8 @@ import android.widget.TextView;
 
 import com.example.chandra.getconnected.R;
 import com.example.chandra.getconnected.albums.Album;
+import com.example.chandra.getconnected.constants.GetConnectedConstants;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -50,16 +52,20 @@ public class UserAdapter extends ArrayAdapter {
         cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((IUserAdapter)context).callProfileView(list.get(position).getObjectId());
+                ((IUserAdapter) context).callProfileView(list.get(position).getObjectId());
             }
         });
         ImageView profile = (ImageView) convertView.findViewById(R.id.profile_pic);
-        profile.setImageBitmap(getRoundedCornerBitmap(list.get(position).getProfile_pic(),100));
 
-        TextView firstname=(TextView)convertView.findViewById(R.id.firstname);
+        if (list.get(position).getProfile_pic_facebook() != null) {
+            Picasso.with(context).load(list.get(position).getProfile_pic_facebook()).into(profile);
+        } else {
+            profile.setImageBitmap(getRoundedCornerBitmap(list.get(position).getProfile_pic(), 100));
+        }
+        TextView firstname = (TextView) convertView.findViewById(R.id.firstname);
         firstname.setText(list.get(position).getFirstname());
 
-        TextView lastname=(TextView)convertView.findViewById(R.id.lastname);
+        TextView lastname = (TextView) convertView.findViewById(R.id.lastname);
         lastname.setText(list.get(position).getLastname());
         return convertView;
     }
@@ -87,7 +93,7 @@ public class UserAdapter extends ArrayAdapter {
         return output;
     }
 
-    public interface IUserAdapter{
+    public interface IUserAdapter {
         public void callProfileView(String objectId);
     }
 }

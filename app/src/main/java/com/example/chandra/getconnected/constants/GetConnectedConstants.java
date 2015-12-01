@@ -33,6 +33,7 @@ public class GetConnectedConstants {
     public static final String USER_GENDER = "gender";
     public static final String USER_LISTED = "userlisted";
     public static final String USER_RECEIVE_PUSH = "receivepush";
+    public static final String USER_IMAGE_FACEBOOK = "imageurlfb";
 
     public static final String MALE = "Male";
     public static final String FEMALE = "Female";
@@ -44,6 +45,7 @@ public class GetConnectedConstants {
     public static final String NO_PHOTOS = "No Photos available.Click menu to add photos to this album";
     public static final String EXISTING_ALBUM = "Existing Album";
 
+    public static final String GET_METHOD = "GET";
 
     public static final String ALBUM_VIEW = "Album view";
     public static final String PHOTO_VIEW = "Photo view";

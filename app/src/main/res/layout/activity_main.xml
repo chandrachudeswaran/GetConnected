@@ -99,6 +99,8 @@
                 android:onClick="doSignup"
                 android:text="   Signup."
                 android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+
+
         </LinearLayout>
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>

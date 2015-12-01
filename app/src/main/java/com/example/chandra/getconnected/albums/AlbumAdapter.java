@@ -239,6 +239,8 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
         void callAddPhotosToAlbum(String objectId);
 
         void callNotificationSharingStatus();
+
+        void callEmptyNotificationSharingAlbum();
     }
 
 
@@ -248,6 +250,7 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
         userDetails = new ArrayList<>();
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.whereNotEqualTo(ParseConstants.OBJECT_ID, ParseUser.getCurrentUser().getObjectId());
+        query.whereEqualTo(GetConnectedConstants.USER_LISTED, true);
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> objects, ParseException e) {
@@ -314,7 +317,7 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
                         for (ParseObject shared_user : shared) {
                             usersHashset.add(shared_user.getParseUser(ParseConstants.SHARED_ALBUM_USER).getObjectId());
                         }
-                        if(usersHashset.size()!=0) {
+                        if (usersHashset.size() != 0) {
                             removeAlreadySharedUsers();
                         }
                     }
@@ -351,8 +354,8 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
     public void removeAlreadySharedUsers() {
         userFinalDetails = new ArrayList<>();
 
-        for(User user:userDetails){
-            if(!usersHashset.contains(user.getObjectId())){
+        for (User user : userDetails) {
+            if (!usersHashset.contains(user.getObjectId())) {
                 userFinalDetails.add(user);
             }
         }
@@ -364,41 +367,45 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
 
 
     public void displayAlert() {
-        users = new CharSequence[userDetails.size()];
-        selectedUserListToShare = new ArrayList<>();
-        for (int i = 0; i < userDetails.size(); i++) {
-            users[i] = userDetails.get(i).toString();
-        }
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Select Users to share the Album")
-                .setCancelable(true)
-                .setMultiChoiceItems(users, null, new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                        if (isChecked) {
-                            selectedUserListToShare.add(which);
-                        } else {
-                            selectedUserListToShare.remove(which);
+        if (userDetails.size() == 0) {
+            ((IAlbumAdapter) context).callEmptyNotificationSharingAlbum();
+        } else {
+            users = new CharSequence[userDetails.size()];
+            selectedUserListToShare = new ArrayList<>();
+            for (int i = 0; i < userDetails.size(); i++) {
+                users[i] = userDetails.get(i).toString();
+            }
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Select Users to share the Album")
+                    .setCancelable(true)
+                    .setMultiChoiceItems(users, null, new DialogInterface.OnMultiChoiceClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                            if (isChecked) {
+                                selectedUserListToShare.add(which);
+                            } else {
+                                selectedUserListToShare.remove(which);
+                            }
                         }
+                    }).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    ArrayList<ParseUser> temp = new ArrayList<ParseUser>();
+                    if (!selectedUserListToShare.isEmpty()) {
+                        for (Integer integer : selectedUserListToShare) {
+                            temp.add(finalList.get(integer));
+                        }
+                        shareAlbum(temp);
                     }
-                }).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                ArrayList<ParseUser> temp = new ArrayList<ParseUser>();
-                if (!selectedUserListToShare.isEmpty()) {
-                    for (Integer integer : selectedUserListToShare) {
-                        temp.add(finalList.get(integer));
-                    }
-                    shareAlbum(temp);
                 }
-            }
-        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
 
-            }
-        });
-        builder.create().show();
+                }
+            });
+            builder.create().show();
+        }
     }
 
     public void shareAlbum(ArrayList<ParseUser> usersListDetails) {

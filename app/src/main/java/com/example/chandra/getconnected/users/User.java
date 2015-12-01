@@ -17,6 +17,15 @@ public class User {
     boolean receive_push;
     String username;
     Bitmap profile_pic;
+    String profile_pic_facebook;
+
+    public String getProfile_pic_facebook() {
+        return profile_pic_facebook;
+    }
+
+    public void setProfile_pic_facebook(String profile_pic_facebook) {
+        this.profile_pic_facebook = profile_pic_facebook;
+    }
 
     public String getFirstname() {
         return firstname;

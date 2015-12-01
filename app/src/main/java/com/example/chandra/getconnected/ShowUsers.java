@@ -151,25 +151,37 @@ public class ShowUsers extends Fragment {
                         user.setObjectId(users.getObjectId());
                         user.setFirstname(users.getString(GetConnectedConstants.USER_FIRST_NAME));
                         user.setLastname(users.getString(GetConnectedConstants.USER_LAST_NAME));
-                        profile_pic_file = users.getParseFile(GetConnectedConstants.USER_PICTURE);
-                        if (profile_pic_file != null) {
-                            profile_pic_file.getDataInBackground(new GetDataCallback() {
-                                @Override
-                                public void done(byte[] data, ParseException e) {
-                                    user.setProfile_pic(PhotoUtility.decodeSampledBitmap(data));
-                                    usersList.add(user);
-                                    adapter = new UserAdapter(context, R.layout.user_listrow, usersList);
-                                    listview.setAdapter(adapter);
-                                    adapter.setNotifyOnChange(true);
-                                }
-                            });
-                        } else {
-                            user.setProfile_pic(BitmapFactory.decodeResource(context.getResources(),
-                                    R.drawable.no_image));
+                        if(users.getString(GetConnectedConstants.USER_IMAGE_FACEBOOK) != null){
+                            user.setProfile_pic_facebook(users.getString(GetConnectedConstants.USER_IMAGE_FACEBOOK));
                             usersList.add(user);
                             adapter = new UserAdapter(context, R.layout.user_listrow, usersList);
                             listview.setAdapter(adapter);
                             adapter.setNotifyOnChange(true);
+                        }
+
+                        else {
+                            profile_pic_file = users.getParseFile(GetConnectedConstants.USER_PICTURE);
+
+
+                            if (profile_pic_file != null) {
+                                profile_pic_file.getDataInBackground(new GetDataCallback() {
+                                    @Override
+                                    public void done(byte[] data, ParseException e) {
+                                        user.setProfile_pic(PhotoUtility.decodeSampledBitmap(data));
+                                        usersList.add(user);
+                                        adapter = new UserAdapter(context, R.layout.user_listrow, usersList);
+                                        listview.setAdapter(adapter);
+                                        adapter.setNotifyOnChange(true);
+                                    }
+                                });
+                            } else {
+                                user.setProfile_pic(BitmapFactory.decodeResource(context.getResources(),
+                                        R.drawable.no_image));
+                                usersList.add(user);
+                                adapter = new UserAdapter(context, R.layout.user_listrow, usersList);
+                                listview.setAdapter(adapter);
+                                adapter.setNotifyOnChange(true);
+                            }
                         }
                     }
                 }
