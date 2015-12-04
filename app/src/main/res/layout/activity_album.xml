@@ -50,6 +50,15 @@
             android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
     </RadioGroup>
 
+    <com.parse.ParseImageView
+        android:id="@+id/cover"
+        android:layout_marginTop="7dp"
+        android:onClick="uploadCoverPic"
+        android:src="@drawable/no_image"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center"/>
+
     <Button
         android:id="@+id/save"
         android:layout_width="match_parent"

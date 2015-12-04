@@ -15,7 +15,7 @@
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
         android:textColor="@color/colorPrimaryDark" />
 
-    <ImageView
+    <com.parse.ParseImageView
         android:id="@+id/imageGrid"
         android:layout_width="150dp"
         android:layout_height="150dp"

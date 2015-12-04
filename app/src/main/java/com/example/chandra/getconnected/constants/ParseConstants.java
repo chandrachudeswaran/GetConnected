@@ -12,6 +12,8 @@ public class ParseConstants {
     public static final String ALBUM_FIELD_TITLE = "Title";
     public static final String ALBUM_FIELD_ISPUBLIC = "ispublic";
     public static final String ALBUM_FIELD_OWNER = "createdbyUser";
+    public static final String ALBUM_FIELD_OWNER_ID = "createdbyuserid";
+    public static final String ALBUM_FIEELD_COVER = "albumphoto";
 
     //Photo Fields
     public static final String PHOTO_TABLE = "Photo";
@@ -25,4 +27,11 @@ public class ParseConstants {
     public static final String SHARED_ALBUM_POINTER = "album";
     public static final String SHARED_ALBUM_USER = "sharedwithuser";
     public static final String SHARED_ALBUM_OWNER = "albumowner";
+
+    //Message Fields
+
+    public static final String MESSAGES_TABLE = "Messages";
+    public static final String MESSAGES_SENDER = "sender";
+    public static final String MESSAGES_RECEIVER = "receiver";
+    public static final String MESSAGES_MESSAGES = "messages";
 }

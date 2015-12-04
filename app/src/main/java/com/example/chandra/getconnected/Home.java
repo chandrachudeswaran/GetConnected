@@ -1,5 +1,7 @@
 package com.example.chandra.getconnected;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
@@ -12,15 +14,19 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.example.chandra.getconnected.albums.AlbumAdapter;
+import com.example.chandra.getconnected.albums.ParseAlbumQueryAdapter;
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
 import com.example.chandra.getconnected.constants.ParseConstants;
-import com.example.chandra.getconnected.users.UserAdapter;
+import com.example.chandra.getconnected.users.ParseUserQueryAdapter;
+import com.example.chandra.getconnected.users.User;
 import com.example.chandra.getconnected.utility.ActivityUtility;
 import com.facebook.FacebookSdk;
 
+import com.parse.FindCallback;
 import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseQuery;
 import com.parse.ParseTwitterUtils;
 import com.parse.ParseUser;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -32,13 +38,16 @@ import java.util.List;
 import io.fabric.sdk.android.Fabric;
 
 public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum, ShowUsers.OnCreateUsers,
-        ShowMessages.OnCreateMessages, ShowNotifications.OnCreateNotifications, AlbumAdapter.IAlbumAdapter, UserAdapter.IUserAdapter {
+        ShowMessages.OnCreateMessages, ShowNotifications.OnCreateNotifications,
+        ParseUserQueryAdapter.IParseUserQueryAdapter, ParseAlbumQueryAdapter.IParseAlbumQueryAdapter {
     private Toolbar mToolbar;
     private CoordinatorLayout coordinatorLayout;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     ParseUser user;
     ShowGallery gallery;
+    ArrayList<User> userList;
+    CharSequence[] users;
 
 
     @Override
@@ -85,6 +94,10 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
         doCreateAlbum();
     }
 
+    public void composeNewMessage(MenuItem item) {
+        ActivityUtility.Helper.writeErrorLog("Com");
+        doComposeMessageForUser();
+    }
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -145,6 +158,12 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
         startActivityForResult(intent, 100);
     }
 
+    public void doComposeMessageForUser() {
+        ActivityUtility.Helper.writeErrorLog("doCom");
+        queryUsers();
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -160,16 +179,22 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
                 break;
             case 200:
                 if (resultCode == RESULT_OK) {
-                    gallery.queryAllAlbumForUser();
+                    gallery.queryAllAlbum(true);
                 }
                 break;
             case 500:
                 if (resultCode == RESULT_OK) {
-                    gallery.queryAllAlbumForUser();
+                    gallery.queryAllAlbum(true);
                 }
             case 1000:
                 if (resultCode == RESULT_OK) {
-                    gallery.queryAllAlbumForUser();
+                    gallery.queryAllAlbum(true);
+                }
+                break;
+
+            case 2000:
+                if (resultCode == RESULT_OK) {
+                    //gallery.queryAllAlbum(true);
                 }
                 break;
         }
@@ -183,35 +208,86 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
         finish();
     }
 
-    @Override
-    public void callEditAlbumIntent(String ObjectId) {
-        Intent intent = new Intent(Home.this, AlbumActivity.class);
-        intent.putExtra(ParseConstants.OBJECT_ID, ObjectId);
-        startActivityForResult(intent, 200);
-    }
-
 
     @Override
-    public void callProfileView(String objectId) {
+    public void callProfileViewForUser(String objectId) {
         Intent intent = new Intent(Home.this, ProfileView.class);
         intent.putExtra(ParseConstants.OBJECT_ID, objectId);
         startActivity(intent);
     }
 
     @Override
-    public void callAddPhotosToAlbum(String objectId) {
+    public void addPhotos(String objectId) {
         Intent intent = new Intent(Home.this, ShowAlbum.class);
         intent.putExtra(ParseConstants.ALBUM_TABLE, objectId);
         startActivityForResult(intent, 1000);
     }
 
     @Override
-    public void callNotificationSharingStatus() {
+    public void updateAlbumView() {
+        gallery.queryAllAlbum(true);
+    }
+
+    @Override
+    public void callEditAlbum(String objectId) {
+        Intent intent = new Intent(Home.this, AlbumActivity.class);
+        intent.putExtra(ParseConstants.OBJECT_ID, objectId);
+        startActivityForResult(intent, 200);
+    }
+
+    @Override
+    public void donotificationSharingStatus() {
         ActivityUtility.Helper.showNotificationLogin(coordinatorLayout, "This Album is not shared with anybody");
     }
 
     @Override
-    public void callEmptyNotificationSharingAlbum() {
-        ActivityUtility.Helper.showNotificationLogin(coordinatorLayout,"Album is shared with all the public users");
+    public void doEmptyNotoficationStatus() {
+        ActivityUtility.Helper.showNotificationLogin(coordinatorLayout, "Album is shared with all the public users");
     }
+
+    public void queryUsers() {
+        ActivityUtility.Helper.writeErrorLog("inside");
+        userList = new ArrayList<>();
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereNotEqualTo(ParseConstants.OBJECT_ID, ParseUser.getCurrentUser().getObjectId());
+        query.whereEqualTo(GetConnectedConstants.USER_LISTED, true);
+        query.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                if (e == null) {
+                    for (ParseUser users : objects) {
+                        User user = new User();
+                        user.setFirstname(users.getString(GetConnectedConstants.USER_FIRST_NAME));
+                        user.setLastname(users.getString(GetConnectedConstants.USER_LAST_NAME));
+                        user.setObjectId(users.getObjectId());
+                        userList.add(user);
+
+                    }
+                    displayDialog();
+                } else {
+                    ActivityUtility.Helper.writeErrorLog(e.toString());
+                }
+            }
+        });
+    }
+
+    public void displayDialog() {
+        ActivityUtility.Helper.writeErrorLog("dialog");
+        users = new CharSequence[userList.size()];
+        for (int i = 0; i < userList.size(); i++) {
+            users[i] = userList.get(i).toString();
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select user to message").
+                setCancelable(true).
+                setItems(users, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        Intent intent = new Intent(Home.this, ComposeMessage.class);
+                        intent.putExtra(ParseConstants.OBJECT_ID, userList.get(item).getObjectId());
+                        startActivityForResult(intent, 2000);
+                    }
+                });
+        builder.create().show();
+    }
+
 }

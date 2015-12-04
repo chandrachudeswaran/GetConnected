@@ -2,6 +2,9 @@ package com.example.chandra.getconnected.utility;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Base64;
+
+import com.parse.ParseFile;
 
 import java.io.ByteArrayOutputStream;
 
@@ -52,4 +55,29 @@ public class PhotoUtility {
         }
         return inSampleSize;
     }
+
+
+    public static String convertImageToString(Bitmap image) {
+
+        ByteArrayOutputStream arrayStream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.JPEG, 100, arrayStream);
+        byte[] b = arrayStream.toByteArray();
+        return Base64.encodeToString(b, Base64.DEFAULT);
+    }
+
+
+    public static Bitmap convertStringToImage(String imageString) {
+
+        byte[] b = Base64.decode(imageString, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(b, 0, b.length);
+    }
+
+
+    public static ParseFile getParseFileFromBitmap(Bitmap image) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.PNG, 0, stream);
+        byte[] temp = stream.toByteArray();
+        return new ParseFile("thumbnail.png", temp);
+    }
+
 }

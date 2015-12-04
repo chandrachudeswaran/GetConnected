@@ -2,11 +2,25 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\chandra\.gradle\caches\modules-2\files-2.1\com.squareup.picasso\picasso\2.5.2\7446d06ec8d4f7ffcc53f1da37c95f200dcb9387\picasso-2.5.2.jar"
+        jar="D:\AndroidWS\GetConnected\app\build\intermediates\exploded-aar\com.parse\parseui-login-android\0.0.1\jars\classes.jar"
         jumboMode="false"
         revision="23.0.1"
-        sha1="7446d06ec8d4f7ffcc53f1da37c95f200dcb9387">
-        <dex dex="D:\AndroidWS\GetConnected\app\build\intermediates\pre-dexed\debug\picasso-2.5.2-17de8a6a73397ba7ca8a113c01b240dc82338478.jar" />
+        sha1="4a2c63ab232bd2c7b750e74794015c8b09aca351">
+        <dex dex="D:\AndroidWS\GetConnected\app\build\intermediates\pre-dexed\debug\classes-05370478e6a3aec3f1630866eb0ec20f06b100db.jar" />
+    </item>
+    <item
+        jar="C:\Users\chandra\.gradle\caches\modules-2\files-2.1\com.parse\parse-android\1.10.3\36366e460af2c0f224bb8f70b64e3302f638b138\parse-android-1.10.3.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="36366e460af2c0f224bb8f70b64e3302f638b138">
+        <dex dex="D:\AndroidWS\GetConnected\app\build\intermediates\pre-dexed\debug\parse-android-1.10.3-95eec952d2f385e241df027af47700caf521de28.jar" />
+    </item>
+    <item
+        jar="D:\AndroidWS\GetConnected\app\build\intermediates\exploded-aar\com.parse\parseui-widget-android\0.0.1\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="76d7e619a84e1c57ad7b153ba84b1213f8ff9ef1">
+        <dex dex="D:\AndroidWS\GetConnected\app\build\intermediates\pre-dexed\debug\classes-70bd0a4c0439b6d370721c1535dee4ec7bc7b022.jar" />
     </item>
 
 </items>

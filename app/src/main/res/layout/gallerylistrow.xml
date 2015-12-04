@@ -28,7 +28,7 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
-            <ImageView
+            <com.parse.ParseImageView
                 android:id="@+id/album"
                 android:layout_width="100dp"
                 android:scaleType="fitXY"

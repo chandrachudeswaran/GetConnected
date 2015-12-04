@@ -56,4 +56,12 @@ public class GetConnectedConstants {
 
     public static final String REMOVE_PHOTOS_OPTION = "Add Photos";
 
+    public static final String CLASS_USER = "User";
+    public static final String CLASS_ALBUM = "Album";
+
+    public static final String JSON_SENDER_LABEL = "senderid";
+    public static final String JSON_RECEIVER_LABEL = "receiverid";
+    public static final String JSON_MESSAGE_CONTENT = "messagetext";
+
+
 }

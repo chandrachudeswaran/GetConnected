@@ -18,14 +18,9 @@ public class User {
     String username;
     Bitmap profile_pic;
     String profile_pic_facebook;
+    String imageStringForSharedPreferences;
 
-    public String getProfile_pic_facebook() {
-        return profile_pic_facebook;
-    }
 
-    public void setProfile_pic_facebook(String profile_pic_facebook) {
-        this.profile_pic_facebook = profile_pic_facebook;
-    }
 
     public String getFirstname() {
         return firstname;
@@ -89,6 +84,21 @@ public class User {
 
     public void setProfile_pic(Bitmap profile_pic) {
         this.profile_pic = profile_pic;
+    }
+    public String getProfile_pic_facebook() {
+        return profile_pic_facebook;
+    }
+
+    public void setProfile_pic_facebook(String profile_pic_facebook) {
+        this.profile_pic_facebook = profile_pic_facebook;
+    }
+
+    public String getImageStringForSharedPreferences() {
+        return imageStringForSharedPreferences;
+    }
+
+    public void setImageStringForSharedPreferences(String imageStringForSharedPreferences) {
+        this.imageStringForSharedPreferences = imageStringForSharedPreferences;
     }
 
     public User() {
