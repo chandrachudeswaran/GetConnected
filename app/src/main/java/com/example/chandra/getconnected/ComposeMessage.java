@@ -112,7 +112,8 @@ public class ComposeMessage extends AppCompatActivity {
             JSONObject message = new JSONObject();
             message.put(GetConnectedConstants.JSON_SENDER_LABEL,senderid);
             message.put(GetConnectedConstants.JSON_RECEIVER_LABEL, receiverid);
-            message.put(GetConnectedConstants.JSON_MESSAGE_CONTENT,text);
+            message.put(GetConnectedConstants.JSON_IMAGE, "");
+            message.put(GetConnectedConstants.JSON_MESSAGE_CONTENT, text);
 
             ActivityUtility.Helper.writeErrorLog(message.toString());
 
@@ -161,6 +162,7 @@ public class ComposeMessage extends AppCompatActivity {
             message.put(GetConnectedConstants.JSON_SENDER_LABEL, senderid);
             message.put(GetConnectedConstants.JSON_RECEIVER_LABEL, receiverid);
             message.put(GetConnectedConstants.JSON_MESSAGE_CONTENT, text);
+            message.put(GetConnectedConstants.JSON_IMAGE, "");
 
 
 

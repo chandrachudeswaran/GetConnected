@@ -70,13 +70,13 @@ public class ParseAlbumQueryAdapter extends ParseQueryAdapter<ParseObject> {
     }
 
     @Override
-    public View getItemView(final ParseObject album, View v, ViewGroup parent) {
-        if (v == null) {
-            v = View.inflate(getContext(), R.layout.gallerylistrow, null);
-            toolbar = (Toolbar) v.findViewById(R.id.toolbar);
-            toolbar.inflateMenu(R.menu.card_menu);
-        }
-        super.getItemView(album, v, parent);
+        public View getItemView(final ParseObject album, View v, ViewGroup parent) {
+            if (v == null) {
+                v = View.inflate(getContext(), R.layout.gallerylistrow, null);
+                toolbar = (Toolbar) v.findViewById(R.id.toolbar);
+                toolbar.inflateMenu(R.menu.card_menu);
+            }
+            super.getItemView(album, v, parent);
 
         ParseImageView albumImage = (ParseImageView) v.findViewById(R.id.album);
         ParseFile imageFile = album.getParseFile(ParseConstants.ALBUM_FIEELD_COVER);

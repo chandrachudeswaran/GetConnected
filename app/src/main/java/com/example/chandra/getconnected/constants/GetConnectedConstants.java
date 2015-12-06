@@ -62,6 +62,12 @@ public class GetConnectedConstants {
     public static final String JSON_SENDER_LABEL = "senderid";
     public static final String JSON_RECEIVER_LABEL = "receiverid";
     public static final String JSON_MESSAGE_CONTENT = "messagetext";
+    public static final String JSON_IMAGE = "imageid";
+    public static final String JSON_TIME = "time";
+
+
+    public static final String LEFT = "Left";
+    public static final String RIGHT = "Right";
 
 
 }

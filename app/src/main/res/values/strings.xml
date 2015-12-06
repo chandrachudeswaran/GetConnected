@@ -17,6 +17,8 @@
     <string name="title_activity_profile_view">ProfileView</string>
     <string name="title_activity_edit_profile">EditProfile</string>
     <string name="title_activity_compose_message">ComposeMessage</string>
+    <string name="title_activity_chat">Chat</string>
+    <string name="title_activity_chat_message_image">ChatMessageImage</string>
 
 
 

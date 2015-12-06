@@ -14,6 +14,10 @@ import android.widget.Toast;
 
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by chandra on 11/23/2015.
  */
@@ -60,5 +64,10 @@ public class ActivityUtility {
             ActivityUtility.Helper.makeToast(context, GetConnectedConstants.NO_INTERNET);
         }
 
+        static public  String getTime(long time){
+            Date date = new Date(time);
+            Format format = new SimpleDateFormat("HH:MM");
+            return format.format(date);
+        }
     }
 }

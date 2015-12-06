@@ -81,6 +81,14 @@
             android:name=".ComposeMessage"
             android:label="@string/title_activity_compose_message" >
         </activity>
+        <activity
+            android:name=".Chat"
+            android:label="@string/title_activity_chat" >
+        </activity>
+        <activity
+            android:name=".ChatMessageImage"
+            android:label="@string/title_activity_chat_message_image" >
+        </activity>
     </application>
 
 </manifest>

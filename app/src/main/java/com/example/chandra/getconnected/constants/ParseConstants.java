@@ -7,6 +7,8 @@ public class ParseConstants {
 
     public static final String OBJECT_ID = "objectId";
 
+    public static final String MESSAGE_ID = "messageId";
+
     //Album Fields
     public static final String ALBUM_TABLE = "Album";
     public static final String ALBUM_FIELD_TITLE = "Title";
@@ -34,4 +36,10 @@ public class ParseConstants {
     public static final String MESSAGES_SENDER = "sender";
     public static final String MESSAGES_RECEIVER = "receiver";
     public static final String MESSAGES_MESSAGES = "messages";
+
+    //MessagesPhoto Fields
+
+    public static final String MESSAGES_PHOTO_TABLE = "MessagesPhoto";
+    public static final String MESSAGES_PHOTO_PHOTO = "photo";
+    public static final String MESSAGES_PHOTO_MESSAGES = "messages";
 }

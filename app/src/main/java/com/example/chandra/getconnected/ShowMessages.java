@@ -11,7 +11,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
+import com.example.chandra.getconnected.messages.ParseMessageQueryAdapter;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.parse.ParseUser;
@@ -25,6 +27,8 @@ public class ShowMessages extends Fragment {
     ParseUser user;
     Context context;
     OnCreateMessages onCreateMessages;
+    ListView listview;
+    ParseMessageQueryAdapter adapter;
 
     public ShowMessages() {
         // Required empty public constructor
@@ -34,8 +38,22 @@ public class ShowMessages extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_show_messages, container, false);
+        View view = inflater.inflate(R.layout.fragment_show_messages, container, false);
+        listview = (ListView) view.findViewById(R.id.messageslistview);
+        adapter = new ParseMessageQueryAdapter(context);
+        listview.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //adapter = new ParseMessageQueryAdapter(context);
+       // listview.setAdapter(adapter);
+        //adapter.notifyDataSetChanged();
+        //adapter.loadObjects();
+       // adapter.setAutoload(true);
     }
 
     @Override
@@ -96,7 +114,7 @@ public class ShowMessages extends Fragment {
     }
 
     public interface OnCreateMessages {
-        public void doFinish();
+        void doFinish();
     }
 
 

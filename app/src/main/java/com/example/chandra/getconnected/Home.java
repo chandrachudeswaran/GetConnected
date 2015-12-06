@@ -17,61 +17,59 @@ import android.view.MenuItem;
 import com.example.chandra.getconnected.albums.ParseAlbumQueryAdapter;
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
 import com.example.chandra.getconnected.constants.ParseConstants;
+import com.example.chandra.getconnected.messages.ParseMessageQueryAdapter;
 import com.example.chandra.getconnected.users.ParseUserQueryAdapter;
 import com.example.chandra.getconnected.users.User;
 import com.example.chandra.getconnected.utility.ActivityUtility;
-import com.facebook.FacebookSdk;
-
 import com.parse.FindCallback;
-import com.parse.Parse;
+import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseFacebookUtils;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseTwitterUtils;
 import com.parse.ParseUser;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterCore;
+import com.parse.SaveCallback;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.fabric.sdk.android.Fabric;
 
 public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum, ShowUsers.OnCreateUsers,
         ShowMessages.OnCreateMessages, ShowNotifications.OnCreateNotifications,
-        ParseUserQueryAdapter.IParseUserQueryAdapter, ParseAlbumQueryAdapter.IParseAlbumQueryAdapter {
+        ParseUserQueryAdapter.IParseUserQueryAdapter, ParseAlbumQueryAdapter.IParseAlbumQueryAdapter, ParseMessageQueryAdapter.IParseMessageQueryAdapter {
     private Toolbar mToolbar;
     private CoordinatorLayout coordinatorLayout;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     ParseUser user;
     ShowGallery gallery;
+    ShowMessages messages;
+    ShowUsers usersShow;
+    ShowNotifications notifications;
     ArrayList<User> userList;
     CharSequence[] users;
-
-
+    ParseObject receiverObject;
+    ParseObject conversationObject;
+    JSONObject messageHistory;
+    JSONObject r;
+    int item_retrieved;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        try {
-            Parse.enableLocalDatastore(this);
-            Parse.initialize(this, GetConnectedConstants.PARSE_APPLICATION_ID, GetConnectedConstants.PARSE_CLIENT_KEY);
-            ParseFacebookUtils.initialize(this);
-            FacebookSdk.sdkInitialize(getApplicationContext());
-            ParseTwitterUtils.initialize(GetConnectedConstants.TWITTER_CONSUMER_KEY, GetConnectedConstants.TWITTER_SECRET_KEY);
-            TwitterAuthConfig authConfig = new TwitterAuthConfig(GetConnectedConstants.TWITTER_CONSUMER_KEY, GetConnectedConstants.TWITTER_SECRET_KEY);
-            Fabric.with(this, new TwitterCore(authConfig));
 
-        } catch (Exception e) {
-        }
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         gallery = new ShowGallery();
+        messages = new ShowMessages();
+        usersShow = new ShowUsers();
+        notifications = new ShowNotifications();
         user = ParseUser.getCurrentUser();
 
         if (user.getString(GetConnectedConstants.USER_FIRST_NAME) == null) {
@@ -95,15 +93,14 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
     }
 
     public void composeNewMessage(MenuItem item) {
-        ActivityUtility.Helper.writeErrorLog("Com");
         doComposeMessageForUser();
     }
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new ShowUsers(), "Users");
-        adapter.addFragment(new ShowMessages(), "Messages");
-        adapter.addFragment(new ShowNotifications(), "Notifications");
+        adapter.addFragment(usersShow, "Users");
+        adapter.addFragment(messages, "Messages");
+        adapter.addFragment(notifications, "Notifications");
         adapter.addFragment(gallery, "Gallery");
         viewPager.setAdapter(adapter);
 
@@ -159,7 +156,6 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
     }
 
     public void doComposeMessageForUser() {
-        ActivityUtility.Helper.writeErrorLog("doCom");
         queryUsers();
 
     }
@@ -246,7 +242,6 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
     }
 
     public void queryUsers() {
-        ActivityUtility.Helper.writeErrorLog("inside");
         userList = new ArrayList<>();
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.whereNotEqualTo(ParseConstants.OBJECT_ID, ParseUser.getCurrentUser().getObjectId());
@@ -272,7 +267,6 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
     }
 
     public void displayDialog() {
-        ActivityUtility.Helper.writeErrorLog("dialog");
         users = new CharSequence[userList.size()];
         for (int i = 0; i < userList.size(); i++) {
             users[i] = userList.get(i).toString();
@@ -282,12 +276,141 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
                 setCancelable(true).
                 setItems(users, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int item) {
-                        Intent intent = new Intent(Home.this, ComposeMessage.class);
-                        intent.putExtra(ParseConstants.OBJECT_ID, userList.get(item).getObjectId());
-                        startActivityForResult(intent, 2000);
+                        item_retrieved = item;
+                        ActivityUtility.Helper.writeErrorLog(ActivityUtility.Helper.getTime(System.currentTimeMillis()));
+                        queryUserObject(userList.get(item).getObjectId());
+
+
                     }
                 });
         builder.create().show();
     }
+
+    @Override
+    public void showMessages(JSONObject message, String other_person, String objectId) {
+        Intent intent = new Intent(Home.this, Chat.class);
+        intent.putExtra("CHAT", message.toString());
+        intent.putExtra("OTHER_PERSON", other_person);
+        intent.putExtra(ParseConstants.OBJECT_ID, objectId);
+
+        startActivity(intent);
+    }
+
+
+
+
+
+
+    public void queryUserObject(String id) {
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereEqualTo(ParseConstants.OBJECT_ID, id);
+        query.getFirstInBackground(new GetCallback<ParseUser>() {
+            @Override
+            public void done(ParseUser object, ParseException e) {
+                if (e == null) {
+                    receiverObject = object;
+                    retrieveConversationHistory();
+                }
+            }
+        });
+    }
+
+    public void retrieveConversationHistory() {
+        messageHistory =null;
+        ParseQuery<ParseObject> sender_query = ParseQuery.getQuery(ParseConstants.MESSAGES_TABLE);
+        sender_query.whereEqualTo(ParseConstants.MESSAGES_SENDER, ParseUser.getCurrentUser());
+        sender_query.whereEqualTo(ParseConstants.MESSAGES_RECEIVER, receiverObject);
+
+        ParseQuery<ParseObject> receiver_query = ParseQuery.getQuery(ParseConstants.MESSAGES_TABLE);
+        receiver_query.whereEqualTo(ParseConstants.MESSAGES_RECEIVER, ParseUser.getCurrentUser());
+        receiver_query.whereEqualTo(ParseConstants.MESSAGES_SENDER, receiverObject);
+
+        List<ParseQuery<ParseObject>> queries = new ArrayList<ParseQuery<ParseObject>>();
+        queries.add(sender_query);
+        queries.add(receiver_query);
+
+        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+        mainQuery.include(ParseConstants.MESSAGES_RECEIVER);
+        mainQuery.include(ParseConstants.MESSAGES_SENDER);
+        mainQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    conversationObject = object;
+                    messageHistory = conversationObject.getJSONObject(ParseConstants.MESSAGES_MESSAGES);
+                } else {
+                    ActivityUtility.Helper.writeErrorLog(e.toString());
+                }
+
+                Intent intent = new Intent(Home.this, Chat.class);
+                intent.putExtra("OTHER_PERSON", userList.get(item_retrieved).getFirstname());
+                if(messageHistory!=null) {
+                    intent.putExtra(ParseConstants.OBJECT_ID, conversationObject.getObjectId());
+                    ActivityUtility.Helper.writeErrorLog("not "+   messageHistory.toString());
+                    intent.putExtra("CHAT", messageHistory.toString());
+                }else{
+                    ActivityUtility.Helper.writeErrorLog("null ");
+                    intent.putExtra("CHAT", "empty");
+                    intent.putExtra("RECEIVERID",userList.get(item_retrieved).getObjectId());
+                }
+                startActivityForResult(intent, 2000);
+            }
+        });
+
+
+    }
+
+    public void updateConversationHistory(JSONObject messageHistory,String text,String senderid,String receiverid){
+
+
+        try {
+            r = messageHistory;
+            ActivityUtility.Helper.writeErrorLog(r.toString());
+            JSONArray array = r.getJSONArray("MessageRoot");
+
+            JSONObject message = new JSONObject();
+            message.put(GetConnectedConstants.JSON_SENDER_LABEL,senderid);
+            message.put(GetConnectedConstants.JSON_RECEIVER_LABEL, receiverid);
+            message.put(GetConnectedConstants.JSON_IMAGE, "");
+            message.put(GetConnectedConstants.JSON_MESSAGE_CONTENT, text);
+
+            ActivityUtility.Helper.writeErrorLog(message.toString());
+
+            array.put(message);
+
+            ActivityUtility.Helper.writeErrorLog(array.toString());
+            r.put("MessageRoot", array);
+            ActivityUtility.Helper.writeErrorLog(r.toString());
+
+            ActivityUtility.Helper.writeErrorLog(r.toString());
+
+            ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.MESSAGES_TABLE);
+            query.whereEqualTo(ParseConstants.OBJECT_ID, conversationObject.getObjectId());
+            query.getFirstInBackground(new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject object, ParseException e) {
+                    if (e == null) {
+                        object.put(ParseConstants.MESSAGES_MESSAGES, r);
+                        object.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    ActivityUtility.Helper.makeToast(Home.this, "Message updated");
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            ActivityUtility.Helper.writeErrorLog(e.toString());
+        }
+
+    }
+
 
 }
