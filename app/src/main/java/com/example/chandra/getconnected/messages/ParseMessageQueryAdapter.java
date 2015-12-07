@@ -41,13 +41,18 @@ public class ParseMessageQueryAdapter extends ParseQueryAdapter<ParseObject> {
                 ParseQuery<ParseObject> receiver_query = ParseQuery.getQuery(ParseConstants.MESSAGES_TABLE);
                 receiver_query.whereEqualTo(ParseConstants.MESSAGES_RECEIVER, ParseUser.getCurrentUser());
 
+
                 List<ParseQuery<ParseObject>> queries = new ArrayList<ParseQuery<ParseObject>>();
                 queries.add(sender_query);
                 queries.add(receiver_query);
 
+
                 ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+                mainQuery.whereEqualTo(ParseConstants.MESSAGES_INBOX,ParseUser.getCurrentUser().getObjectId());
                 mainQuery.include(ParseConstants.MESSAGES_RECEIVER);
                 mainQuery.include(ParseConstants.MESSAGES_SENDER);
+
+
                 return mainQuery;
             }
         });
@@ -79,8 +84,7 @@ public class ParseMessageQueryAdapter extends ParseQueryAdapter<ParseObject> {
         layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ActivityUtility.Helper.writeErrorLog("onclick");
-                        ((IParseMessageQueryAdapter) getContext()).
+                ((IParseMessageQueryAdapter) getContext()).
                         showMessages(messages.getJSONObject(ParseConstants.MESSAGES_MESSAGES), message.getText().toString(), messages.getObjectId());
             }
         });

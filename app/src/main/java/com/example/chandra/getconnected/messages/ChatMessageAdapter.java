@@ -53,11 +53,14 @@ public class ChatMessageAdapter extends ArrayAdapter {
 
 
         LinearLayout layout = (LinearLayout) convertView.findViewById(R.id.parent);
+        layout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return true;
+            }
+        });
         View v = layout.getChildAt(0);
         layout.removeView(v);
-
-
-
 
 
         if (objects.get(position).isImage()) {
@@ -72,8 +75,8 @@ public class ChatMessageAdapter extends ArrayAdapter {
             parentLayout.setOrientation(LinearLayout.VERTICAL);
 
             TextView time = new TextView(getContext());
-            params.setMargins(7,7,7,7);
-            params.gravity=Gravity.CENTER;
+            params.setMargins(7, 7, 7, 7);
+            params.gravity = Gravity.CENTER;
             time.setTextAppearance(getContext(), android.R.style.TextAppearance_DeviceDefault_Small);
             time.setLayoutParams(params);
             time.setText(objects.get(position).getTime());
@@ -135,12 +138,11 @@ public class ChatMessageAdapter extends ArrayAdapter {
             text.setText(objects.get(position).getMessage());
 
             TextView time = new TextView(getContext());
-            params.setMargins(7,7,7,7);
-            params.gravity=Gravity.BOTTOM;
+            params.setMargins(7, 7, 7, 7);
+            params.gravity = Gravity.BOTTOM;
             time.setTextAppearance(getContext(), android.R.style.TextAppearance_DeviceDefault_Small);
             time.setLayoutParams(params);
             time.setText(objects.get(position).getTime());
-
 
 
             if (objects.get(position).getPosition().equals(GetConnectedConstants.LEFT)) {

@@ -277,7 +277,7 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
                 setItems(users, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int item) {
                         item_retrieved = item;
-                        ActivityUtility.Helper.writeErrorLog(ActivityUtility.Helper.getTime(System.currentTimeMillis()));
+                        //Get receiver id for sending message and query for ParseUser object
                         queryUserObject(userList.get(item).getObjectId());
 
 
@@ -288,17 +288,15 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
 
     @Override
     public void showMessages(JSONObject message, String other_person, String objectId) {
-        Intent intent = new Intent(Home.this, Chat.class);
+        Intent intent = new Intent(Home.this, Chatting.class);
+        //History message
         intent.putExtra("CHAT", message.toString());
+        //For displaying name in screen
         intent.putExtra("OTHER_PERSON", other_person);
+        //Message row object id
         intent.putExtra(ParseConstants.OBJECT_ID, objectId);
-
         startActivity(intent);
     }
-
-
-
-
 
 
     public void queryUserObject(String id) {
@@ -309,8 +307,46 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
             public void done(ParseUser object, ParseException e) {
                 if (e == null) {
                     receiverObject = object;
-                    retrieveConversationHistory();
+                    //Pull the conversation history to whom to chat if available
+                    getConversationHistory();
                 }
+            }
+        });
+    }
+
+    public void getConversationHistory(){
+        messageHistory =null;
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.MESSAGES_TABLE);
+        query.whereEqualTo(ParseConstants.MESSAGES_IDENTIFIER,ParseUser.getCurrentUser().getObjectId()+","+receiverObject.getObjectId());
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                if(e==null){
+                    messageHistory=object.getJSONObject(ParseConstants.MESSAGES_MESSAGES);
+                }else{
+                    messageHistory=null;
+                }
+                Intent intent = new Intent(Home.this,Chatting.class);
+                if(messageHistory!=null) {
+                    intent.putExtra("CHAT", messageHistory.toString());
+                    intent.putExtra(ParseConstants.OBJECT_ID,object.getObjectId());
+                }else{
+                    intent.putExtra("CHAT","empty");
+                    intent.putExtra(ParseConstants.OBJECT_ID,"empty");
+                    intent.putExtra("OTHER_PERSON_ID",userList.get(item_retrieved).getObjectId());
+                }
+                intent.putExtra("OTHER_PERSON",userList.get(item_retrieved).getFirstname());
+                //TO DO Check for Result Activity
+
+
+
+
+
+
+
+
+
+                startActivity(intent);
             }
         });
     }

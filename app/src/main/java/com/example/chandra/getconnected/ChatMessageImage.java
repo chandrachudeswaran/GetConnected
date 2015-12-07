@@ -38,9 +38,8 @@ public class ChatMessageImage extends AppCompatActivity {
     ParseImageView image;
     Bitmap picture;
     ProgressDialog dialog;
-    String id;
     ParseObject messageObject;
-    boolean objectbool = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +47,6 @@ public class ChatMessageImage extends AppCompatActivity {
         setContentView(R.layout.activity_chat_message_image);
         image = (ParseImageView) findViewById(R.id.image);
 
-        if (getIntent().getExtras() != null) {
-            id = getIntent().getExtras().getString(ParseConstants.OBJECT_ID);
-        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(Color.BLACK);
@@ -66,59 +62,50 @@ public class ChatMessageImage extends AppCompatActivity {
     }
 
     public void onSend(View v) {
+        doSave();
+    }
 
+    public void doSave() {
         if (picture != null) {
             dialog = new ProgressDialog(ChatMessageImage.this);
             dialog.setMessage("Sending Image");
             dialog.setCancelable(false);
             dialog.show();
-            ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.MESSAGES_TABLE);
-            query.whereEqualTo(ParseConstants.OBJECT_ID, id);
-            query.getFirstInBackground(new GetCallback<ParseObject>() {
+
+
+            final ParseObject photoMessage = new ParseObject(ParseConstants.MESSAGES_PHOTO_TABLE);
+            final ParseFile image = PhotoUtility.getParseFileFromBitmap(picture);
+            image.saveInBackground(new SaveCallback() {
                 @Override
-                public void done(ParseObject object, ParseException e) {
+                public void done(ParseException e) {
                     if (e == null) {
-                        messageObject = object;
-                    }else{
-                        objectbool=true;
-                    }
+                        photoMessage.put(ParseConstants.MESSAGES_PHOTO_PHOTO, image);
+                        photoMessage.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
 
-                    final ParseObject photoMessage = new ParseObject(ParseConstants.MESSAGES_PHOTO_TABLE);
-                    final ParseFile image = PhotoUtility.getParseFileFromBitmap(picture);
-                    image.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e == null) {
-                                photoMessage.put(ParseConstants.MESSAGES_PHOTO_PHOTO, image);
-                                if(!objectbool) {
-                                    photoMessage.put(ParseConstants.MESSAGES_PHOTO_MESSAGES, messageObject);
+                                    String imageString = PhotoUtility.convertImageToString(picture);
+                                    SharedPreferenceHelper helper = new SharedPreferenceHelper();
+                                    helper.saveInSharedPreference(ChatMessageImage.this, photoMessage.getObjectId(), imageString);
+                                    dialog.dismiss();
+                                    Intent intent = new Intent();
+                                    intent.putExtra(ParseConstants.OBJECT_ID, photoMessage.getObjectId());
+                                    setResult(RESULT_OK, intent);
+                                    finish();
+
+                                } else {
+                                    ActivityUtility.Helper.writeErrorLog(e.toString());
                                 }
-                                photoMessage.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if (e == null) {
-                                            String imageString = PhotoUtility.convertImageToString(picture);
-                                            SharedPreferenceHelper helper = new SharedPreferenceHelper();
-                                            helper.saveInSharedPreference(ChatMessageImage.this, photoMessage.getObjectId(), imageString);
-                                            dialog.dismiss();
-                                            Intent intent = new Intent();
-                                            intent.putExtra(ParseConstants.OBJECT_ID, photoMessage.getObjectId());
-                                            setResult(RESULT_OK, intent);
-                                            finish();
-                                        } else {
-                                            ActivityUtility.Helper.writeErrorLog(e.toString());
-                                        }
-                                    }
-                                });
                             }
-                        }
-                    });
-
+                        });
+                    }
                 }
             });
 
 
         }
+
 
     }
 

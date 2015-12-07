@@ -36,10 +36,13 @@ public class ParseConstants {
     public static final String MESSAGES_SENDER = "sender";
     public static final String MESSAGES_RECEIVER = "receiver";
     public static final String MESSAGES_MESSAGES = "messages";
+    public static final String MESSAGES_INBOX = "userinbox";
+    public static final String MESSAGES_IDENTIFIER = "identifier";
 
     //MessagesPhoto Fields
 
     public static final String MESSAGES_PHOTO_TABLE = "MessagesPhoto";
     public static final String MESSAGES_PHOTO_PHOTO = "photo";
     public static final String MESSAGES_PHOTO_MESSAGES = "messages";
+    public static final String MESSAGES_PHOTO_INBOX = "userinbox";
 }
