@@ -1,6 +1,8 @@
 package com.example.chandra.getconnected;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,7 +35,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class Chatting extends AppCompatActivity {
+public class Chatting extends AppCompatActivity implements ChatMessageAdapter.IChatMessageAdapter {
     private Toolbar mToolbar;
     EditText message_edit;
     ListView userlistview;
@@ -68,7 +70,7 @@ public class Chatting extends AppCompatActivity {
                 //Getting message history
                 conversationHistory = new JSONObject(getIntent().getExtras().getString("CHAT"));
                 //Get Message ID
-                currentMessageId= getIntent().getExtras().getString(ParseConstants.OBJECT_ID);
+                currentMessageId = getIntent().getExtras().getString(ParseConstants.OBJECT_ID);
                 //other than current user
                 getOtherPersonId();
                 //List to be displayed
@@ -79,7 +81,7 @@ public class Chatting extends AppCompatActivity {
                 getSecondMessageId();
 
             } else {
-                other_person_id= getIntent().getExtras().getString("OTHER_PERSON_ID");
+                other_person_id = getIntent().getExtras().getString("OTHER_PERSON_ID");
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -168,7 +170,7 @@ public class Chatting extends AppCompatActivity {
             public void done(ParseUser object, ParseException e) {
                 if (e == null) {
                     other_person_object = object;
-                    other_person_id=other_person_object.getObjectId();
+                    other_person_id = other_person_object.getObjectId();
                     createNewJsonMessage(ParseUser.getCurrentUser().getObjectId(), other_person_id, text, image, true);
 
                 }
@@ -218,7 +220,7 @@ public class Chatting extends AppCompatActivity {
                     if (e == null) {
 
                         if (first_time) {
-                            currentMessageId=obj.getObjectId();
+                            currentMessageId = obj.getObjectId();
                             createNewJsonMessage(ParseUser.getCurrentUser().getObjectId(), other_person_id, text, image, false);
                         } else {
                             conversationHistory = root;
@@ -241,7 +243,7 @@ public class Chatting extends AppCompatActivity {
 
     public void updateConversationHistory(final JSONObject messageHistory, String messageid, final String text, final String senderid, final String receiverid, final boolean image, final boolean first_time) {
 
-        ActivityUtility.Helper.writeErrorLog("message"+ messageHistory.toString());
+        ActivityUtility.Helper.writeErrorLog("message" + messageHistory.toString());
         ActivityUtility.Helper.writeErrorLog(messageid);
         ActivityUtility.Helper.writeErrorLog(text);
         ActivityUtility.Helper.writeErrorLog(senderid);
@@ -277,7 +279,7 @@ public class Chatting extends AppCompatActivity {
                             public void done(ParseException e) {
                                 if (e == null) {
 
-                                    if(first_time) {
+                                    if (first_time) {
                                         updateConversationHistory(to_be_Update_messageIdObject.getJSONObject(ParseConstants.MESSAGES_MESSAGES),
                                                 to_be_Update_messageId, text, senderid, receiverid, image, false);
                                     }
@@ -321,7 +323,7 @@ public class Chatting extends AppCompatActivity {
                     chatMessage.setPosition(GetConnectedConstants.RIGHT);
                     chatMessage.setTime(ActivityUtility.Helper.getTime(System.currentTimeMillis()));
                     chatMessage.setImage(true);
-                    chatMessage.setIsNew(true);
+                    chatMessage.setIsNew(false);
                     chatMessage.setImageid(uploadImaageId);
                     chatMessageArrayList.add(chatMessage);
                     adapter = new ChatMessageAdapter(Chatting.this, R.layout.chatmessagelistrow, chatMessageArrayList);
@@ -344,10 +346,75 @@ public class Chatting extends AppCompatActivity {
     }
 
 
+    @Override
+    public void deleteMessage(ChatMessage chatMessage,int position) {
 
+        displayAlertForDeleteMessage(chatMessage, position);
+
+    }
 
     @Override
     public void onBackPressed() {
         finish();
+    }
+
+    public void displayAlertForDeleteMessage(final ChatMessage chatMessage,final int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(Chatting.this);
+        builder.setTitle("Delete Message")
+                .setCancelable(false)
+                .setMessage("Are you sure you want to delete this Message?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        adapter = new ChatMessageAdapter(Chatting.this, R.layout.chatmessagelistrow, chatMessageArrayList);
+                        userlistview.setAdapter(adapter);
+                        chatMessageArrayList.remove(chatMessage);
+                        adapter.setNotifyOnChange(true);
+                        deleteFromParse(position);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+        builder.create().show();
+    }
+
+
+    public void deleteFromParse(int position){
+
+        try {
+            JSONArray list = new JSONArray();
+            JSONArray jsonArray = (conversationHistory.getJSONArray("MessageRoot"));
+            int len = jsonArray.length();
+            if (jsonArray != null) {
+                for (int i=0;i<len;i++)
+                {
+                    if (i != position)
+                    {
+                        list.put(jsonArray.get(i));
+                    }
+                }
+            }
+            conversationHistory = new JSONObject();
+            conversationHistory.put("MessageRoot", list);
+            ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.MESSAGES_TABLE);
+            query.whereEqualTo(ParseConstants.OBJECT_ID,currentMessageId);
+            query.getFirstInBackground(new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject object, ParseException e) {
+                    if(e==null){
+                        object.put(ParseConstants.MESSAGES_MESSAGES,conversationHistory);
+                        object.saveInBackground();
+                    }
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 }

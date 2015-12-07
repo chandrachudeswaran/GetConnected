@@ -45,7 +45,7 @@ public class ChatMessageAdapter extends ArrayAdapter {
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(resource, parent, false);
@@ -56,6 +56,8 @@ public class ChatMessageAdapter extends ArrayAdapter {
         layout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+
+                ((IChatMessageAdapter)context).deleteMessage(objects.get(position),position);
                 return true;
             }
         });
@@ -164,4 +166,7 @@ public class ChatMessageAdapter extends ArrayAdapter {
         return convertView;
     }
 
+    public interface IChatMessageAdapter{
+        public void deleteMessage(ChatMessage chatMessage,int index);
+    }
 }

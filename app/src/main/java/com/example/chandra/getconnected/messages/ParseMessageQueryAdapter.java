@@ -90,11 +90,14 @@ public class ParseMessageQueryAdapter extends ParseQueryAdapter<ParseObject> {
         });
 
 
+
+
         return v;
     }
 
 
     public interface IParseMessageQueryAdapter {
         void showMessages(JSONObject message, String person_name, String objectId);
+
     }
 }

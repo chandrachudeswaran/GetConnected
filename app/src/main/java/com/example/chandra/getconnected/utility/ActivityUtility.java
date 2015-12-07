@@ -66,7 +66,7 @@ public class ActivityUtility {
 
         static public  String getTime(long time){
             Date date = new Date(time);
-            Format format = new SimpleDateFormat("HH:MM");
+            Format format = new SimpleDateFormat("HH:mm");
             return format.format(date);
         }
     }
