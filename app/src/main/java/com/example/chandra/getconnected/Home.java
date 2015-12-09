@@ -281,6 +281,37 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
 
     }
 
+    @Override
+    public void deleteNotification(String notificationId) {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.NOTIFICATIONS_TABLE);
+        query.whereEqualTo(ParseConstants.OBJECT_ID, notificationId);
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    try {
+                        object.delete();
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+                    object.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            notifications.queryNotifications();
+                        }
+                    });
+                } else {
+                    ActivityUtility.Helper.writeErrorLog(e.toString());
+                }
+            }
+        });
+    }
+
+    @Override
+    public void deleteEntireThread() {
+
+    }
+
     public void addPhotosToAllAlbum(String objectId, boolean addingByOwner) {
         Intent intent = new Intent(Home.this, ShowAlbum.class);
         intent.putExtra(ParseConstants.ALBUM_TABLE, objectId);

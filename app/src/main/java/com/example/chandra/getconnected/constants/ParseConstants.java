@@ -55,4 +55,5 @@ public class ParseConstants {
     public static final String NOTIFICATIONS_TOUSER = "ToUser";
     public static final String NOTIFICATIONS_ALBUM = "Album";
     public static final String NOTIFICATIONS_PHOTOS = "Photo";
+    public static final String NOTIFICATIONS_MESSAGE = "Message";
 }

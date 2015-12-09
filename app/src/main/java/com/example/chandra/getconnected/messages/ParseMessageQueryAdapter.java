@@ -66,6 +66,8 @@ public class ParseMessageQueryAdapter extends ParseQueryAdapter<ParseObject> {
         }
         super.getItemView(messages, v, parent);
 
+
+
         ParseImageView profile_pic = (ParseImageView) v.findViewById(R.id.profie_pic);
 
         final TextView message = (TextView) v.findViewById(R.id.message);
@@ -89,6 +91,12 @@ public class ParseMessageQueryAdapter extends ParseQueryAdapter<ParseObject> {
             }
         });
 
+        layout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return true;
+            }
+        });
 
 
 
@@ -98,6 +106,7 @@ public class ParseMessageQueryAdapter extends ParseQueryAdapter<ParseObject> {
 
     public interface IParseMessageQueryAdapter {
         void showMessages(JSONObject message, String person_name, String objectId);
+        void deleteEntireThread();
 
     }
 }

@@ -19,12 +19,15 @@ import android.widget.TextView;
 
 import com.example.chandra.getconnected.PhotoView;
 import com.example.chandra.getconnected.R;
+import com.example.chandra.getconnected.constants.GetConnectedConstants;
 import com.example.chandra.getconnected.constants.ParseConstants;
 import com.example.chandra.getconnected.utility.ActivityUtility;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 
 import java.util.ArrayList;
@@ -42,6 +45,8 @@ public class PhotoAdapter extends BaseAdapter {
     ParseObject photoObject;
     boolean deletePhoto;
     String photoid;
+    ParseUser sendApprovalUser;
+    ParseObject photoBelongToAlbum;
 
 
     public PhotoAdapter(Context context, int resource, ArrayList<Photo> list, boolean approve) {
@@ -114,10 +119,10 @@ public class PhotoAdapter extends BaseAdapter {
 
     public void displayAlertForApproval(final int position, final String objectId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Approve Photo")
+        builder.setTitle("Approve/Reject Photo")
                 .setCancelable(false)
-                .setMessage("Are you sure you want to approve the photo to this Album?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                .setMessage("What do you want to do with this photo?")
+                .setPositiveButton("Approve", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         list.remove(position);
@@ -125,7 +130,7 @@ public class PhotoAdapter extends BaseAdapter {
                         updateModerated(objectId);
                     }
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                .setNegativeButton("Reject", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         deletePhoto = true;
@@ -140,15 +145,17 @@ public class PhotoAdapter extends BaseAdapter {
 
         final ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.NOTIFICATIONS_TABLE);
         query.whereEqualTo(ParseConstants.NOTIFICATIONS_PHOTOS, photo);
+        query.include(ParseConstants.NOTIFICATIONS_FROMUSER);
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
                     try {
+                        sendApprovalUser = object.getParseUser(ParseConstants.NOTIFICATIONS_FROMUSER);
                         object.delete();
                         object.saveInBackground();
                         if (!deletePhoto) {
-                            ((IPhotoAdapter) context).finishApproval();
+                            createNotificationOnAlbumStatus("approved");
                         } else {
                             deletePhotoSelected(photoid);
                         }
@@ -164,14 +171,29 @@ public class PhotoAdapter extends BaseAdapter {
 
     }
 
+    public void createNotificationOnAlbumStatus(String text){
+        ParseObject notification = new ParseObject(ParseConstants.NOTIFICATIONS_TABLE);
+        notification.put(ParseConstants.NOTIFICATIONS_FROMUSER,ParseUser.getCurrentUser());
+        notification.put(ParseConstants.NOTIFICATIONS_TOUSER,sendApprovalUser);
+        notification.put(ParseConstants.NOTIFICATIONS_MESSAGE, ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME)+ " "+text+ " the photo to the album " + photoBelongToAlbum.getString(ParseConstants.ALBUM_FIELD_TITLE));
+        notification.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                ((IPhotoAdapter) context).finishApproval();
+            }
+        });
+    }
+
     public void queryPhotoObjectForNotificationDeletion(String photoid) {
         final ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.PHOTO_TABLE);
         query.whereEqualTo(ParseConstants.OBJECT_ID, photoid);
+        query.include(ParseConstants.PHOTO_ALBUM);
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
                     photoObject = object;
+                    photoBelongToAlbum=object.getParseObject(ParseConstants.PHOTO_ALBUM);
                     deleteNotifications(photoObject);
                 }
             }
@@ -232,8 +254,8 @@ public class PhotoAdapter extends BaseAdapter {
                     try {
                         object.delete();
                         object.saveInBackground();
-                        if(deletePhoto){
-                            ((IPhotoAdapter) context).finishApproval();
+                        if (deletePhoto) {
+                            createNotificationOnAlbumStatus("rejected");
                         }
                     } catch (ParseException e1) {
                         e1.printStackTrace();

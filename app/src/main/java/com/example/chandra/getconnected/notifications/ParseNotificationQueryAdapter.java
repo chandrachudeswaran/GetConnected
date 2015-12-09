@@ -2,6 +2,8 @@ package com.example.chandra.getconnected.notifications;
 
 import android.content.Context;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -21,6 +23,7 @@ import com.squareup.picasso.Picasso;
  * Created by chandra on 12/8/2015.
  */
 public class ParseNotificationQueryAdapter extends ParseQueryAdapter<ParseObject> {
+    Toolbar toolbar;
 
     public ParseNotificationQueryAdapter(Context context) {
         super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
@@ -34,26 +37,41 @@ public class ParseNotificationQueryAdapter extends ParseQueryAdapter<ParseObject
         });
     }
 
-    public interface IParseNotificationQueryAdapter{
-        void doApprovePhotosForTheAlbum(String photoId,String albumId);
+    public interface IParseNotificationQueryAdapter {
+        void doApprovePhotosForTheAlbum(String photoId, String albumId);
+        void deleteNotification(String notificationId);
     }
 
     @Override
     public View getItemView(final ParseObject album, View v, ViewGroup parent) {
         if (v == null) {
             v = View.inflate(getContext(), R.layout.gallerylistrow, null);
-
+            toolbar = (Toolbar) v.findViewById(R.id.toolbar);
+            if (album.getParseObject(ParseConstants.NOTIFICATIONS_ALBUM) != null) {
+                toolbar.inflateMenu(R.menu.notifications_card_pending_menu);
+            }else{
+                toolbar.inflateMenu(R.menu.notifications_card_approval_menu);
+            }
         }
         super.getItemView(album, v, parent);
 
         CardView cardView = (CardView) v.findViewById(R.id.card_view);
-        cardView.setOnClickListener(new View.OnClickListener() {
+        Toolbar tool = (Toolbar) cardView.getChildAt(0);
+        tool.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
-            public void onClick(View v) {
-                ((IParseNotificationQueryAdapter)getContext()).doApprovePhotosForTheAlbum
-                        (album.getParseObject(ParseConstants.NOTIFICATIONS_PHOTOS).getObjectId(), album.getParseObject(ParseConstants.NOTIFICATIONS_ALBUM).getObjectId());
+            public boolean onMenuItemClick(MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.takeaction) {
+                    ((IParseNotificationQueryAdapter) getContext()).doApprovePhotosForTheAlbum
+                            (album.getParseObject(ParseConstants.NOTIFICATIONS_PHOTOS).getObjectId(), album.getParseObject(ParseConstants.NOTIFICATIONS_ALBUM).getObjectId());
+                }
+                if (id == R.id.deletenotification) {
+                    ((IParseNotificationQueryAdapter) getContext()).deleteNotification(album.getObjectId());
+                }
+                return true;
             }
         });
+
         ParseImageView albumImage = (ParseImageView) v.findViewById(R.id.album);
         if (album.getParseUser(ParseConstants.NOTIFICATIONS_FROMUSER).getString(GetConnectedConstants.USER_IMAGE_FACEBOOK) != null) {
             Picasso.with(getContext()).load(album.getParseUser(ParseConstants.NOTIFICATIONS_FROMUSER).getString(GetConnectedConstants.USER_IMAGE_FACEBOOK)).into(albumImage);
@@ -67,9 +85,7 @@ public class ParseNotificationQueryAdapter extends ParseQueryAdapter<ParseObject
 
         TextView title = (TextView) v.findViewById(R.id.title);
         title.setTextAppearance(getContext(), android.R.style.TextAppearance_DeviceDefault_Medium);
-        String text = album.getParseUser(ParseConstants.NOTIFICATIONS_FROMUSER).getString(GetConnectedConstants.USER_FIRST_NAME) + " " + "added photos to album- " +" "+
-                album.getParseObject(ParseConstants.NOTIFICATIONS_ALBUM).getString(ParseConstants.ALBUM_FIELD_TITLE);
-        title.setText(text);
+        title.setText(album.getString(ParseConstants.NOTIFICATIONS_MESSAGE));
 
         return v;
 

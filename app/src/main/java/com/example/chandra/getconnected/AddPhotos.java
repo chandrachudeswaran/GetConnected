@@ -199,6 +199,8 @@ public class AddPhotos extends AppCompatActivity {
                             notifications.put(ParseConstants.NOTIFICATIONS_ALBUM, album);
                             notifications.put(ParseConstants.NOTIFICATIONS_TOUSER,album.getParseUser(ParseConstants.ALBUM_FIELD_OWNER));
                             notifications.put(ParseConstants.NOTIFICATIONS_PHOTOS,photo);
+                            notifications.put(ParseConstants.NOTIFICATIONS_MESSAGE,
+                                            ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME)+ " added photo to the album "+ album.getString(ParseConstants.ALBUM_FIELD_TITLE));
                             notifications.saveInBackground();
                             Intent intent = new Intent();
                             intent.putExtra("AddedbyInvitee", true);
