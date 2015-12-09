@@ -38,13 +38,19 @@ public class PhotoAdapter extends BaseAdapter {
     Context context;
     int resource;
     ArrayList<Photo> list;
+    boolean approve;
+    ParseObject photoObject;
+    boolean deletePhoto;
+    String photoid;
 
 
-    public PhotoAdapter(Context context, int resource, ArrayList<Photo> list) {
+    public PhotoAdapter(Context context, int resource, ArrayList<Photo> list, boolean approve) {
 
         this.context = context;
         this.resource = resource;
         this.list = list;
+        this.approve = approve;
+        this.deletePhoto = false;
     }
 
 
@@ -84,15 +90,112 @@ public class PhotoAdapter extends BaseAdapter {
             }
         });
 
-        imageView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                displayAlertDialog(position, list.get(position).getObjectId());
+        if (!approve) {
+            imageView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    displayAlertDialog(position, list.get(position).getObjectId());
+                    return true;
+                }
+            });
+        } else {
+            imageView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    photoid = list.get(position).getObjectId();
+                    displayAlertForApproval(position, list.get(position).getObjectId());
+                    return true;
+                }
+            });
+        }
+        return convertView;
+    }
 
-                return true;
+
+    public void displayAlertForApproval(final int position, final String objectId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Approve Photo")
+                .setCancelable(false)
+                .setMessage("Are you sure you want to approve the photo to this Album?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        list.remove(position);
+                        notifyDataSetChanged();
+                        updateModerated(objectId);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deletePhoto = true;
+                        queryPhotoObjectForNotificationDeletion(objectId);
+                    }
+                });
+
+        builder.create().show();
+    }
+
+    public void deleteNotifications(ParseObject photo) {
+
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.NOTIFICATIONS_TABLE);
+        query.whereEqualTo(ParseConstants.NOTIFICATIONS_PHOTOS, photo);
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    try {
+                        object.delete();
+                        object.saveInBackground();
+                        if (!deletePhoto) {
+                            ((IPhotoAdapter) context).finishApproval();
+                        } else {
+                            deletePhotoSelected(photoid);
+                        }
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+                } else {
+                    ActivityUtility.Helper.writeErrorLog(e.toString());
+                }
             }
         });
-        return convertView;
+
+
+    }
+
+    public void queryPhotoObjectForNotificationDeletion(String photoid) {
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.PHOTO_TABLE);
+        query.whereEqualTo(ParseConstants.OBJECT_ID, photoid);
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    photoObject = object;
+                    deleteNotifications(photoObject);
+                }
+            }
+        });
+    }
+
+    public void updateModerated(final String id) {
+
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.PHOTO_TABLE);
+        query.whereEqualTo(ParseConstants.OBJECT_ID, id);
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    object.put(ParseConstants.PHOTO_MODERATED_BY_OWNER, true);
+                    object.saveInBackground();
+                    queryPhotoObjectForNotificationDeletion(id);
+
+                } else {
+                    ActivityUtility.Helper.writeErrorLog(e.toString());
+                }
+            }
+        });
+
     }
 
 
@@ -129,6 +232,9 @@ public class PhotoAdapter extends BaseAdapter {
                     try {
                         object.delete();
                         object.saveInBackground();
+                        if(deletePhoto){
+                            ((IPhotoAdapter) context).finishApproval();
+                        }
                     } catch (ParseException e1) {
                         e1.printStackTrace();
                     }
@@ -139,4 +245,7 @@ public class PhotoAdapter extends BaseAdapter {
         });
     }
 
+    public interface IPhotoAdapter {
+        void finishApproval();
+    }
 }

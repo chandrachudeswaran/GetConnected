@@ -11,7 +11,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
+import com.example.chandra.getconnected.notifications.ParseNotificationQueryAdapter;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.parse.ParseUser;
@@ -24,6 +26,8 @@ public class ShowNotifications extends Fragment {
     ParseUser user;
     Context context;
     OnCreateNotifications onCreateNotifications;
+    ListView listView;
+    ParseNotificationQueryAdapter adapter;
 
     public ShowNotifications() {
         // Required empty public constructor
@@ -33,8 +37,11 @@ public class ShowNotifications extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_show_notifications, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_show_notifications, container, false);
+        listView = (ListView) view.findViewById(R.id.notificationslistview);
+        queryNotifications();
+        return view;
     }
 
     @Override
@@ -48,6 +55,12 @@ public class ShowNotifications extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         getActivity().getMenuInflater().inflate(R.menu.menu_home, menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    public void queryNotifications(){
+        adapter= new ParseNotificationQueryAdapter(context);
+        listView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 
     @Override

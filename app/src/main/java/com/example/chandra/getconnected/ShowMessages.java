@@ -40,22 +40,20 @@ public class ShowMessages extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_show_messages, container, false);
         listview = (ListView) view.findViewById(R.id.messageslistview);
-        adapter = new ParseMessageQueryAdapter(context);
-        listview.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
+        queryConversations();
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        //adapter = new ParseMessageQueryAdapter(context);
-       // listview.setAdapter(adapter);
-        //adapter.notifyDataSetChanged();
-        //adapter.loadObjects();
-       // adapter.setAutoload(true);
     }
 
+    public void queryConversations(){
+        adapter = new ParseMessageQueryAdapter(context);
+        listview.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);

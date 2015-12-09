@@ -24,7 +24,7 @@ import com.parse.ParseQuery;
 
 import java.util.ArrayList;
 
-public class ShowAlbum extends AppCompatActivity {
+public class ShowAlbum extends AppCompatActivity implements PhotoAdapter.IPhotoAdapter {
     private Toolbar mToolbar;
     TextView title;
     TextView hint;
@@ -32,6 +32,9 @@ public class ShowAlbum extends AppCompatActivity {
     PhotosImpl photosImpl;
     String album_id;
     boolean remove_photos = false;
+    boolean addingByOwner;
+    String photoId;
+    boolean approve = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,13 +51,21 @@ public class ShowAlbum extends AppCompatActivity {
         if (getIntent().getExtras() != null) {
             album_id = getIntent().getExtras().getString(ParseConstants.ALBUM_TABLE);
 
+            //Public albums visited by other users should not have add photos option
             remove_photos = getIntent().getExtras().getBoolean(GetConnectedConstants.REMOVE_PHOTOS_OPTION);
+
+            addingByOwner = getIntent().getExtras().getBoolean(GetConnectedConstants.PHOTOS_ADDING_BY_OWNER);
+
+            if (getIntent().getExtras().getBoolean("Approve")) {
+                photoId = getIntent().getExtras().getString(ParseConstants.NOTIFICATIONS_PHOTOS);
+                approve = true;
+            }
 
         }
 
         photosImpl = new PhotosImpl();
         photosImpl.queryForPhotos(album_id, title, ShowAlbum.this,
-                new ImageListImpl(hint, grid, R.layout.grid_photos, ShowAlbum.this));
+                new ImageListImpl(hint, grid, R.layout.grid_photos, ShowAlbum.this),approve,photoId);
 
     }
 
@@ -74,6 +85,7 @@ public class ShowAlbum extends AppCompatActivity {
         if (id == R.id.addphotos) {
             Intent intent = new Intent(ShowAlbum.this, AddPhotos.class);
             intent.putExtra(ParseConstants.ALBUM_TABLE, album_id);
+            intent.putExtra(GetConnectedConstants.PHOTOS_ADDING_BY_OWNER, addingByOwner);
             startActivityForResult(intent, 100);
             return true;
         }
@@ -87,16 +99,29 @@ public class ShowAlbum extends AppCompatActivity {
         switch (requestCode) {
             case 100:
                 if (resultCode == RESULT_OK) {
+                    if (data.getExtras() != null) {
+                        ActivityUtility.Helper.makeToast(getApplicationContext(), "Added Photos will be available after owner's approval");
+                    }
                     photosImpl.queryForPhotos(album_id, title, ShowAlbum.this,
-                            new ImageListImpl(hint, grid, R.layout.grid_photos, ShowAlbum.this));
+                            new ImageListImpl(hint, grid, R.layout.grid_photos, ShowAlbum.this),approve,photoId);
                 }
+
         }
     }
 
     @Override
     public void onBackPressed() {
+        onFinish();
+    }
+
+    public void onFinish(){
         Intent intent = new Intent();
-        setResult(RESULT_OK,intent);
+        setResult(RESULT_OK, intent);
         finish();
+    }
+
+    @Override
+    public void finishApproval() {
+        onFinish();
     }
 }

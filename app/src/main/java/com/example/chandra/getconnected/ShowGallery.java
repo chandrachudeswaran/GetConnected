@@ -13,9 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.chandra.getconnected.albums.Album;
 import com.example.chandra.getconnected.albums.ParseAlbumQueryAdapter;
+import com.example.chandra.getconnected.albums.ParseInvitedAlbumQueryAdapter;
+import com.example.chandra.getconnected.constants.GetConnectedConstants;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.parse.ParseFile;
@@ -35,6 +38,7 @@ public class ShowGallery extends Fragment {
     Context context;
     ListView listView;
     ParseUser user;
+    TextView owner;
 
     public ShowGallery() {
 
@@ -92,6 +96,7 @@ public class ShowGallery extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_show_gallery, container, false);
         listView = (ListView) view.findViewById(R.id.gallerylistview);
+        owner = (TextView) view.findViewById(R.id.owner);
         queryAllAlbum(false);
         return view;
     }
@@ -125,14 +130,21 @@ public class ShowGallery extends Fragment {
         super.onResume();
     }
 
-    public void queryAllAlbum(boolean condition){
+    public void queryAllAlbum(boolean condition) {
         ParseAlbumQueryAdapter adapter = new ParseAlbumQueryAdapter(context);
+        owner.setText(GetConnectedConstants.OWNED_ALBUM_LABEL);
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-        if(true){
+        if (condition) {
             adapter.loadObjects();
         }
     }
 
 
+    public void queryInvitedAlbum() {
+        ParseInvitedAlbumQueryAdapter parseInvitedAlbumQueryAdapter = new ParseInvitedAlbumQueryAdapter(context);
+        owner.setText(GetConnectedConstants.INVITED_ALBUM_LABEL);
+        listView.setAdapter(parseInvitedAlbumQueryAdapter);
+        parseInvitedAlbumQueryAdapter.notifyDataSetChanged();
+    }
 }

@@ -22,7 +22,7 @@ public class PhotosImpl implements IPhotos {
     ImageListImpl list;
 
     @Override
-    public void queryForPhotos(String objectId, View title, Context context, ImageListImpl imageList) {
+    public void queryForPhotos(String objectId, View title, Context context, ImageListImpl imageList,final boolean approve,final String photoId) {
         titleView = (TextView) title;
         this.context_activity = context;
         this.list=imageList;
@@ -36,7 +36,7 @@ public class PhotosImpl implements IPhotos {
                     titleView.setText(object.getString(ParseConstants.ALBUM_FIELD_TITLE));
                 }
 
-                new GetPhotos(context_activity, album, list);
+                new GetPhotos(context_activity, album, list,approve,photoId);
             }
         });
     }

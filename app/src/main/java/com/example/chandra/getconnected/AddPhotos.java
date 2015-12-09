@@ -25,6 +25,7 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.io.ByteArrayOutputStream;
@@ -40,17 +41,23 @@ public class AddPhotos extends AppCompatActivity {
     ParseFile imageParseFile;
     ProgressDialog dialog;
     String album_id;
+    boolean addingByOwner;
+    ParseObject photo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_photos);
 
-        title=(EditText)findViewById(R.id.title);
-        imageView=(ImageView)findViewById(R.id.photo);
-
-        album_id = getIntent().getExtras().getString(ParseConstants.ALBUM_TABLE);
+        title = (EditText) findViewById(R.id.title);
+        imageView = (ImageView) findViewById(R.id.photo);
+        if (getIntent().getExtras() != null) {
+            album_id = getIntent().getExtras().getString(ParseConstants.ALBUM_TABLE);
+            addingByOwner = getIntent().getExtras().getBoolean(GetConnectedConstants.PHOTOS_ADDING_BY_OWNER);
+        }
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.ALBUM_TABLE);
         query.whereEqualTo("objectId", album_id);
+        query.include(ParseConstants.ALBUM_FIELD_OWNER);
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject object, ParseException e) {
@@ -60,7 +67,6 @@ public class AddPhotos extends AppCompatActivity {
             }
         });
     }
-
 
 
     @Override
@@ -119,12 +125,11 @@ public class AddPhotos extends AppCompatActivity {
 
     public void onSubmit(View view) {
 
-        if(title.getText().length()==0){
+        if (title.getText().length() == 0) {
             ActivityUtility.Helper.makeToast(AddPhotos.this, GetConnectedConstants.TITLE_REQUIRED);
-        }else if(picture==null){
-            ActivityUtility.Helper.makeToast(AddPhotos.this,"Please choose a photo to add");
-        }
-        else{
+        } else if (picture == null) {
+            ActivityUtility.Helper.makeToast(AddPhotos.this, "Please choose a photo to add");
+        } else {
             final ByteArrayOutputStream stream = new ByteArrayOutputStream();
             picture.compress(Bitmap.CompressFormat.PNG, 50, stream);
             byte[] image = stream.toByteArray();
@@ -133,17 +138,22 @@ public class AddPhotos extends AppCompatActivity {
         }
     }
 
-    private class Upload extends AsyncTask<ParseFile ,Void,Integer > {
+    private class Upload extends AsyncTask<ParseFile, Void, Integer> {
         @Override
         protected Integer doInBackground(final ParseFile... params) {
             params[0].saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
                     if (e == null) {
-                        final ParseObject photo = new ParseObject(ParseConstants.PHOTO_TABLE);
-                        photo.put(ParseConstants.PHOTO_ALBUM,album);
-                        photo.put(ParseConstants.PHOTO_CAPTION,title.getText().toString());
-                        photo.put(ParseConstants.PHOTO_FIELD_FILE,imageParseFile);
+                        photo = new ParseObject(ParseConstants.PHOTO_TABLE);
+                        photo.put(ParseConstants.PHOTO_ALBUM, album);
+                        photo.put(ParseConstants.PHOTO_CAPTION, title.getText().toString());
+                        photo.put(ParseConstants.PHOTO_FIELD_FILE, imageParseFile);
+                        if (addingByOwner) {
+                            photo.put(ParseConstants.PHOTO_MODERATED_BY_OWNER, true);
+                        } else {
+                            photo.put(ParseConstants.PHOTO_MODERATED_BY_OWNER, false);
+                        }
                         new DoUpload().execute(photo);
                     }
                     if (e != null) {
@@ -171,7 +181,7 @@ public class AddPhotos extends AppCompatActivity {
     }
 
 
-    private class DoUpload extends AsyncTask<ParseObject ,Void,Integer >{
+    private class DoUpload extends AsyncTask<ParseObject, Void, Integer> {
         @Override
         protected Integer doInBackground(final ParseObject... params) {
             params[0].saveInBackground(new SaveCallback() {
@@ -179,9 +189,22 @@ public class AddPhotos extends AppCompatActivity {
                 public void done(ParseException e) {
                     if (e == null) {
                         dialog.dismiss();
-                        Intent intent = new Intent();
-                        setResult(RESULT_OK,intent);
-                        finish();
+                        if (addingByOwner) {
+                            Intent intent = new Intent();
+                            setResult(RESULT_OK, intent);
+                            finish();
+                        } else {
+                            ParseObject notifications = new ParseObject(ParseConstants.NOTIFICATIONS_TABLE);
+                            notifications.put(ParseConstants.NOTIFICATIONS_FROMUSER, ParseUser.getCurrentUser());
+                            notifications.put(ParseConstants.NOTIFICATIONS_ALBUM, album);
+                            notifications.put(ParseConstants.NOTIFICATIONS_TOUSER,album.getParseUser(ParseConstants.ALBUM_FIELD_OWNER));
+                            notifications.put(ParseConstants.NOTIFICATIONS_PHOTOS,photo);
+                            notifications.saveInBackground();
+                            Intent intent = new Intent();
+                            intent.putExtra("AddedbyInvitee", true);
+                            setResult(RESULT_OK, intent);
+                            finish();
+                        }
                     } else {
                         ActivityUtility.Helper.writeErrorLog(e.toString());
 
@@ -193,13 +216,13 @@ public class AddPhotos extends AppCompatActivity {
         }
 
 
-
         @Override
         protected void onPostExecute(Integer i) {
             super.onPostExecute(i);
 
         }
     }
+
     @Override
     public void onBackPressed() {
         finish();

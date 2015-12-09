@@ -43,7 +43,6 @@ public class ParseAlbumQueryAdapter extends ParseQueryAdapter<ParseObject> {
     HashSet<String> usersHashset;
     List<ParseUser> finalList;
     ArrayList<User> userDetails;
-    HashMap<Integer, Integer> track;
     ArrayList<User> userFinalDetails;
     ArrayList<Integer> selectedUserListToShare;
     ParseObject album;
@@ -142,7 +141,7 @@ public class ParseAlbumQueryAdapter extends ParseQueryAdapter<ParseObject> {
                     public void onClick(DialogInterface dialog, int which) {
                         id = objectId;
                         queryAlbum(objectId, true, false);
-                        ((IParseAlbumQueryAdapter) getContext()).updateAlbumView();
+
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -188,7 +187,7 @@ public class ParseAlbumQueryAdapter extends ParseQueryAdapter<ParseObject> {
                 if (e == null) {
                     deleteAllPhotos(album);
                 } else {
-                    deleteAlbum(id);
+                    checkAlbumSharing(id);
                 }
             }
         });
@@ -205,7 +204,7 @@ public class ParseAlbumQueryAdapter extends ParseQueryAdapter<ParseObject> {
                         try {
                             object.delete();
                             object.saveInBackground();
-                            deleteAlbum(id);
+                            checkAlbumSharing(id);
                         } catch (ParseException e1) {
                             e1.printStackTrace();
                         }
@@ -226,7 +225,12 @@ public class ParseAlbumQueryAdapter extends ParseQueryAdapter<ParseObject> {
                 if (e == null) {
                     try {
                         object.delete();
-                        object.saveInBackground();
+                        object.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                ((IParseAlbumQueryAdapter) getContext()).updateAlbumView();
+                            }
+                        });
                     } catch (ParseException e1) {
                         e1.printStackTrace();
                     }
@@ -237,6 +241,43 @@ public class ParseAlbumQueryAdapter extends ParseQueryAdapter<ParseObject> {
         });
     }
 
+    public void checkAlbumSharing(final String id){
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.SHARED_ALBUM_TABLE);
+        query.whereEqualTo(ParseConstants.SHARED_ALBUM_POINTER,album);
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                if(e==null){
+                    deleteAlbumSharing(id);
+                }else{
+                    deleteAlbum(id);
+                }
+            }
+        });
+    }
+
+    public void deleteAlbumSharing(final String id){
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.SHARED_ALBUM_TABLE);
+        query.whereEqualTo(ParseConstants.SHARED_ALBUM_POINTER,album);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if(e==null){
+                    for(ParseObject object:objects){
+                        try {
+                            object.delete();
+                            object.saveInBackground();
+                        } catch (ParseException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                    deleteAlbum(id);
+                }else{
+                    ActivityUtility.Helper.writeErrorLog(e.toString());
+                }
+            }
+        });
+    }
     public void queryUsersForShareAlbum(final boolean sharing_status) {
         userList = new ArrayList<>();
         usersHashset = new HashSet<>();

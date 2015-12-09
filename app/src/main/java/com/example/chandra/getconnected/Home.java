@@ -15,9 +15,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.example.chandra.getconnected.albums.ParseAlbumQueryAdapter;
+import com.example.chandra.getconnected.albums.ParseInvitedAlbumQueryAdapter;
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
 import com.example.chandra.getconnected.constants.ParseConstants;
 import com.example.chandra.getconnected.messages.ParseMessageQueryAdapter;
+import com.example.chandra.getconnected.notifications.ParseNotificationQueryAdapter;
 import com.example.chandra.getconnected.users.ParseUserQueryAdapter;
 import com.example.chandra.getconnected.users.User;
 import com.example.chandra.getconnected.utility.ActivityUtility;
@@ -32,13 +34,18 @@ import com.parse.SaveCallback;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum, ShowUsers.OnCreateUsers,
         ShowMessages.OnCreateMessages, ShowNotifications.OnCreateNotifications,
-        ParseUserQueryAdapter.IParseUserQueryAdapter, ParseAlbumQueryAdapter.IParseAlbumQueryAdapter, ParseMessageQueryAdapter.IParseMessageQueryAdapter {
+        ParseUserQueryAdapter.IParseUserQueryAdapter, ParseAlbumQueryAdapter.IParseAlbumQueryAdapter,
+        ParseMessageQueryAdapter.IParseMessageQueryAdapter,
+        ParseInvitedAlbumQueryAdapter.IParseInvitedAlbumQueryAdapter,
+        ParseNotificationQueryAdapter.IParseNotificationQueryAdapter {
+
     private Toolbar mToolbar;
     private CoordinatorLayout coordinatorLayout;
     private TabLayout tabLayout;
@@ -51,10 +58,12 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
     ArrayList<User> userList;
     CharSequence[] users;
     ParseObject receiverObject;
-    ParseObject conversationObject;
     JSONObject messageHistory;
     JSONObject r;
     int item_retrieved;
+    //True to display owned albums
+    boolean toggleAlbums = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +99,11 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
 
     public void createAlbum(MenuItem item) {
         doCreateAlbum();
+    }
+
+    public void toggleAlbums(MenuItem item) {
+        toggleAlbums = !toggleAlbums;
+        doToggleAlbums();
     }
 
     public void composeNewMessage(MenuItem item) {
@@ -193,6 +207,18 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
                     //gallery.queryAllAlbum(true);
                 }
                 break;
+
+            case 3000:
+                if (resultCode == RESULT_OK) {
+                    notifications.queryNotifications();
+                }
+                break;
+
+            case 4000:
+                if (resultCode == RESULT_OK) {
+                    messages.queryConversations();
+                }
+                break;
         }
 
     }
@@ -214,9 +240,7 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
 
     @Override
     public void addPhotos(String objectId) {
-        Intent intent = new Intent(Home.this, ShowAlbum.class);
-        intent.putExtra(ParseConstants.ALBUM_TABLE, objectId);
-        startActivityForResult(intent, 1000);
+        addPhotosToAllAlbum(objectId, true);
     }
 
     @Override
@@ -239,6 +263,29 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
     @Override
     public void doEmptyNotoficationStatus() {
         ActivityUtility.Helper.showNotificationLogin(coordinatorLayout, "Album is shared with all the public users");
+    }
+
+    @Override
+    public void addPhotosToInvitedAlbum(String objectId) {
+        addPhotosToAllAlbum(objectId, false);
+    }
+
+    @Override
+    public void doApprovePhotosForTheAlbum(String photoId, String albumId) {
+        Intent intent = new Intent(Home.this, ShowAlbum.class);
+        intent.putExtra(ParseConstants.ALBUM_TABLE, albumId);
+        intent.putExtra(ParseConstants.NOTIFICATIONS_PHOTOS, photoId);
+        intent.putExtra(GetConnectedConstants.REMOVE_PHOTOS_OPTION, true);
+        intent.putExtra("Approve", true);
+        startActivityForResult(intent, 3000);
+
+    }
+
+    public void addPhotosToAllAlbum(String objectId, boolean addingByOwner) {
+        Intent intent = new Intent(Home.this, ShowAlbum.class);
+        intent.putExtra(ParseConstants.ALBUM_TABLE, objectId);
+        intent.putExtra(GetConnectedConstants.PHOTOS_ADDING_BY_OWNER, addingByOwner);
+        startActivityForResult(intent, 1000);
     }
 
     public void queryUsers() {
@@ -314,44 +361,41 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
         });
     }
 
-    public void getConversationHistory(){
-        messageHistory =null;
+    public void getConversationHistory() {
+        messageHistory = null;
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.MESSAGES_TABLE);
-        query.whereEqualTo(ParseConstants.MESSAGES_IDENTIFIER,ParseUser.getCurrentUser().getObjectId()+","+receiverObject.getObjectId());
+        query.whereEqualTo(ParseConstants.MESSAGES_IDENTIFIER, ParseUser.getCurrentUser().getObjectId() + "," + receiverObject.getObjectId());
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject object, ParseException e) {
-                if(e==null){
-                    messageHistory=object.getJSONObject(ParseConstants.MESSAGES_MESSAGES);
-                }else{
-                    messageHistory=null;
+                if (e == null) {
+                    messageHistory = object.getJSONObject(ParseConstants.MESSAGES_MESSAGES);
+                } else {
+                    messageHistory = null;
                 }
-                Intent intent = new Intent(Home.this,Chatting.class);
-                if(messageHistory!=null) {
+                Intent intent = new Intent(Home.this, Chatting.class);
+                if (messageHistory != null) {
                     intent.putExtra("CHAT", messageHistory.toString());
-                    intent.putExtra(ParseConstants.OBJECT_ID,object.getObjectId());
-                }else{
-                    intent.putExtra("CHAT","empty");
-                    intent.putExtra(ParseConstants.OBJECT_ID,"empty");
-                    intent.putExtra("OTHER_PERSON_ID",userList.get(item_retrieved).getObjectId());
+                    intent.putExtra(ParseConstants.OBJECT_ID, object.getObjectId());
+                } else {
+                    intent.putExtra("CHAT", "empty");
+                    intent.putExtra(ParseConstants.OBJECT_ID, "empty");
+                    intent.putExtra("OTHER_PERSON_ID", userList.get(item_retrieved).getObjectId());
                 }
-                intent.putExtra("OTHER_PERSON",userList.get(item_retrieved).getFirstname());
+                intent.putExtra("OTHER_PERSON", userList.get(item_retrieved).getFirstname());
                 //TO DO Check for Result Activity
-
-
-
-
-
-
-
-
-
-                startActivity(intent);
+                startActivityForResult(intent, 4000);
             }
         });
     }
 
-
+    public void doToggleAlbums() {
+        if (toggleAlbums) {
+            gallery.queryAllAlbum(true);
+        } else {
+            gallery.queryInvitedAlbum();
+        }
+    }
 
 
 }

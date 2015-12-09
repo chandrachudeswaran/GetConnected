@@ -119,8 +119,8 @@ public class ChatMessageAdapter extends ArrayAdapter {
 
                 parentLayout.addView(imageview1);
                 parentLayout.addView(time);
-                card.addView(parentLayout);
-                layout.addView(card);
+                //card.addView(parentLayout);
+                layout.addView(parentLayout);
             }
         } else {
 

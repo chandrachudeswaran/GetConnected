@@ -30,15 +30,56 @@ public class GetPhotos {
     ParseFile file;
     ArrayList<Photo> list;
     ImageList imageList;
+    boolean approve;
+    String photoid;
+    ParseObject photo;
 
-    public GetPhotos(Context context, ParseObject album, ImageList imageList) {
+    public GetPhotos(Context context, ParseObject album, ImageList imageList, boolean approve,String photoId) {
         this.context = context;
         this.album = album;
         this.imageList = imageList;
         list = new ArrayList<>();
+        this.approve=approve;
+        this.photoid=photoId;
 
         displayDialog();
-        photo_exists();
+        if (!approve) {
+            photo_exists();
+        } else {
+            queryPhotoObjectForApproval();
+        }
+
+    }
+
+    public void showPendingPhotos() {
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.NOTIFICATIONS_TABLE);
+        query.whereEqualTo(ParseConstants.NOTIFICATIONS_ALBUM,album);
+        query.whereEqualTo(ParseConstants.NOTIFICATIONS_PHOTOS,photo);
+        query.include(ParseConstants.NOTIFICATIONS_PHOTOS);
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    final Photo photo = new Photo();
+                    ParseObject ph = object.getParseObject(ParseConstants.NOTIFICATIONS_PHOTOS);
+                    photo.setObjectId(ph.getObjectId());
+                    photo.setTitle(ph.getString(ParseConstants.PHOTO_CAPTION));
+                    file = ph.getParseFile(ParseConstants.PHOTO_FIELD_FILE);
+                    file.getDataInBackground(new GetDataCallback() {
+                        @Override
+                        public void done(byte[] data, ParseException e) {
+                            photo.setImage(PhotoUtility.decodeSampledBitmap(data));
+                            list.add(photo);
+                            setImage(true);
+
+
+                        }
+                    });
+                } else {
+                    ActivityUtility.Helper.writeErrorLog(e.toString());
+                }
+            }
+        });
 
     }
 
@@ -49,16 +90,17 @@ public class GetPhotos {
         dialog.show();
     }
 
-    public void photo_exists(){
+    public void photo_exists() {
         final ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.PHOTO_TABLE);
         query.whereEqualTo(ParseConstants.PHOTO_ALBUM, album);
+        query.whereEqualTo(ParseConstants.PHOTO_MODERATED_BY_OWNER, true);
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject object, ParseException e) {
-                if(e==null){
-                  query();
-                }else{
-                    setImage();
+                if (e == null) {
+                    query();
+                } else {
+                    setImage(false);
                 }
             }
         });
@@ -67,6 +109,7 @@ public class GetPhotos {
     public void query() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.PHOTO_TABLE);
         query.whereEqualTo(ParseConstants.PHOTO_ALBUM, album);
+        query.whereEqualTo(ParseConstants.PHOTO_MODERATED_BY_OWNER, true);
         query.findInBackground(new FindCallback<ParseObject>() {
                                    @Override
                                    public void done(List<ParseObject> objects, ParseException e) {
@@ -81,7 +124,7 @@ public class GetPhotos {
                                                    public void done(byte[] data, ParseException e) {
                                                        photo.setImage(PhotoUtility.decodeSampledBitmap(data));
                                                        list.add(photo);
-                                                       setImage();
+                                                       setImage(false);
 
 
                                                    }
@@ -98,15 +141,31 @@ public class GetPhotos {
 
     }
 
-    public void setImage() {
+    public void setImage(boolean approve) {
         dialog.dismiss();
-        imageList.sendImages(list);
+        imageList.sendImages(list,approve);
 
     }
+
 
     public interface ImageList {
-        public void sendImages(ArrayList<Photo> images);
+        void sendImages(ArrayList<Photo> images,boolean approve);
     }
 
+    public void queryPhotoObjectForApproval(){
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.PHOTO_TABLE);
+        query.whereEqualTo(ParseConstants.OBJECT_ID,photoid);
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                if(e==null){
+                    photo=object;
+                    showPendingPhotos();
+                }else{
+                    ActivityUtility.Helper.writeErrorLog(e.toString());
+                }
+            }
+        });
+    }
 
 }

@@ -21,6 +21,7 @@ public class ImageListImpl implements GetPhotos.ImageList {
     int resource;
     Context context;
 
+
     public ImageListImpl(View hint, View grid, int resource, Context context) {
 
         this.hint = (TextView) hint;
@@ -30,14 +31,14 @@ public class ImageListImpl implements GetPhotos.ImageList {
     }
 
     @Override
-    public void sendImages(ArrayList<Photo> images) {
+    public void sendImages(ArrayList<Photo> images,boolean approve) {
 
         if (images.isEmpty()) {
 
             hint.setText(GetConnectedConstants.NO_PHOTOS);
         } else {
             hint.setText(" ");
-            PhotoAdapter adapter = new PhotoAdapter(context,resource, images);
+            PhotoAdapter adapter = new PhotoAdapter(context,resource, images,approve);
             grid.setAdapter(adapter);
             adapter.notifyDataSetChanged();
         }

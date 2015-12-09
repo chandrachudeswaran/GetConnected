@@ -8,5 +8,5 @@ import android.view.View;
  */
 public interface IPhotos {
 
-    public void queryForPhotos(String objectId,View title,Context context,ImageListImpl imageList);
+    public void queryForPhotos(String objectId,View title,Context context,ImageListImpl imageList,boolean approve,String photoId);
 }

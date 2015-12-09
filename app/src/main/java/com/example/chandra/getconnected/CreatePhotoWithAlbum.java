@@ -25,12 +25,10 @@ import java.util.ArrayList;
 
 public class CreatePhotoWithAlbum extends AppCompatActivity {
     private Toolbar mToolbar;
-    ParseObject album;
     GridView grid;
     String album_id;
     TextView title;
     TextView message;
-    boolean condition;
     PhotosImpl photosImpl;
 
     @Override
@@ -66,6 +64,7 @@ public class CreatePhotoWithAlbum extends AppCompatActivity {
 
             Intent intent = new Intent(CreatePhotoWithAlbum.this, AddPhotos.class);
             intent.putExtra(ParseConstants.ALBUM_TABLE, album_id);
+            intent.putExtra(GetConnectedConstants.PHOTOS_ADDING_BY_OWNER, true);
             startActivityForResult(intent, 100);
             return true;
         }
@@ -75,7 +74,7 @@ public class CreatePhotoWithAlbum extends AppCompatActivity {
 
 
     public void queryForPhotos() {
-        photosImpl.queryForPhotos(album_id,title,CreatePhotoWithAlbum.this,new ImageListImpl(message,grid,R.layout.grid_photos,CreatePhotoWithAlbum.this));
+        photosImpl.queryForPhotos(album_id,title,CreatePhotoWithAlbum.this,new ImageListImpl(message,grid,R.layout.grid_photos,CreatePhotoWithAlbum.this),false,null);
 
     }
 
