@@ -306,6 +306,17 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
             }
         });
     }
+    @Override
+    public void showMessages(JSONObject message, String other_person, String objectId) {
+        Intent intent = new Intent(Home.this, Chatting.class);
+        //History message
+        intent.putExtra("CHAT", message.toString());
+        //For displaying name in screen
+        intent.putExtra("OTHER_PERSON", other_person);
+        //Message row object id
+        intent.putExtra(ParseConstants.OBJECT_ID, objectId);
+        startActivity(intent);
+    }
 
     @Override
     public void deleteEntireThread() {
@@ -364,17 +375,7 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
         builder.create().show();
     }
 
-    @Override
-    public void showMessages(JSONObject message, String other_person, String objectId) {
-        Intent intent = new Intent(Home.this, Chatting.class);
-        //History message
-        intent.putExtra("CHAT", message.toString());
-        //For displaying name in screen
-        intent.putExtra("OTHER_PERSON", other_person);
-        //Message row object id
-        intent.putExtra(ParseConstants.OBJECT_ID, objectId);
-        startActivity(intent);
-    }
+
 
 
     public void queryUserObject(String id) {

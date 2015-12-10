@@ -15,12 +15,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.example.chandra.getconnected.constants.ParseConstants;
 import com.example.chandra.getconnected.users.ParseUserQueryAdapter;
 import com.example.chandra.getconnected.users.User;
 import com.example.chandra.getconnected.utility.SharedPreferenceHelper;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.parse.ParseFile;
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -88,6 +90,9 @@ public class ShowUsers extends Fragment {
                 }
             } else {
                 ParseUser.logOut();
+                ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+                installation.put(ParseConstants.INSTALLATION_USERID, "");
+                installation.saveInBackground();
                 onCreateUsers.doFinish();
             }
         }

@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
+import com.example.chandra.getconnected.constants.ParseConstants;
 import com.example.chandra.getconnected.utility.ActivityUtility;
 import com.example.chandra.getconnected.utility.ParsingUtility;
 import com.facebook.AccessToken;
@@ -26,6 +27,7 @@ import com.parse.LogInCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseInstallation;
 import com.parse.ParseTwitterUtils;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -92,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 ParseTwitterUtils.initialize(GetConnectedConstants.TWITTER_CONSUMER_KEY, GetConnectedConstants.TWITTER_SECRET_KEY);
                 TwitterAuthConfig authConfig = new TwitterAuthConfig(GetConnectedConstants.TWITTER_CONSUMER_KEY, GetConnectedConstants.TWITTER_SECRET_KEY);
                 Fabric.with(this, new TwitterCore(authConfig));
+                ParseInstallation.getCurrentInstallation().saveInBackground();
 
             } catch (Exception e) {
             }
@@ -105,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
             email_edit = (EditText) findViewById(R.id.username);
             password_edit = (EditText) findViewById(R.id.password);
             tweets = (TwitterLoginButton) findViewById(R.id.submit_twittert);
+
             ParseUser user = ParseUser.getCurrentUser();
             if (user != null) {
                 showHome();
@@ -283,6 +287,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void showHome() {
+        ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+        installation.put(ParseConstants.INSTALLATION_USERID, ParseUser.getCurrentUser().getObjectId());
+        installation.saveInBackground();
         Intent intent = new Intent(MainActivity.this, Home.class);
         startActivityForResult(intent, 100);
     }

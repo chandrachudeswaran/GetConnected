@@ -13,9 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.example.chandra.getconnected.constants.ParseConstants;
 import com.example.chandra.getconnected.notifications.ParseNotificationQueryAdapter;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 
 
@@ -88,6 +90,9 @@ public class ShowNotifications extends Fragment {
                 }
             } else {
                 ParseUser.logOut();
+                ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+                installation.put(ParseConstants.INSTALLATION_USERID, "");
+                installation.saveInBackground();
                 onCreateNotifications.doFinish();
             }
         }

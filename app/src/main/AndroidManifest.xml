@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.chandra.getconnected" >
+    package="com.example.chandra.getconnected">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -9,13 +9,21 @@
     <uses-permission android:name="com.google.android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <permission android:protectionLevel="signature"
+        android:name="com.parse.starter.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.example.chandra.getconnected.permission.C2D_MESSAGE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:theme="@style/MyMaterialTheme" >
+        android:theme="@style/MyMaterialTheme">
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
@@ -34,7 +42,7 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -43,48 +51,62 @@
         </activity>
         <activity
             android:name=".Signup"
-            android:label="@string/title_activity_signup" >
-        </activity>
+            android:label="@string/title_activity_signup"></activity>
         <activity
             android:name=".Home"
-            android:label="@string/title_activity_home" >
-        </activity>
+            android:label="@string/title_activity_home"></activity>
         <activity
             android:name=".AlbumActivity"
-            android:label="@string/title_activity_album" >
-        </activity>
+            android:label="@string/title_activity_album"></activity>
         <activity
             android:name=".CreatePhotoWithAlbum"
-            android:label="@string/title_activity_create_photo_with_album" >
-        </activity>
+            android:label="@string/title_activity_create_photo_with_album"></activity>
         <activity
             android:name=".AddPhotos"
-            android:label="@string/title_activity_add_photos" >
-        </activity>
+            android:label="@string/title_activity_add_photos"></activity>
         <activity
             android:name=".ShowAlbum"
-            android:label="@string/title_activity_show_album" >
-        </activity>
+            android:label="@string/title_activity_show_album"></activity>
         <activity
             android:name=".PhotoView"
-            android:label="@string/title_activity_photo_view" >
-        </activity>
+            android:label="@string/title_activity_photo_view"></activity>
         <activity
             android:name=".ProfileView"
-            android:label="@string/title_activity_profile_view" >
-        </activity>
+            android:label="@string/title_activity_profile_view"></activity>
         <activity
             android:name=".EditProfile"
-            android:label="@string/title_activity_edit_profile" >
-        </activity>
+            android:label="@string/title_activity_edit_profile"></activity>
         <activity
             android:name=".ChatMessageImage"
-            android:label="@string/title_activity_chat_message_image" >
-        </activity>
+            android:label="@string/title_activity_chat_message_image"></activity>
         <activity
             android:name=".Chatting"
-            android:label="@string/title_activity_chatting" >
-        </activity>
+            android:label="@string/title_activity_chatting"></activity>
+
+        <service android:name="com.parse.PushService" />
+
+        <receiver
+            android:name="com.parse.ParsePushBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.parse.push.intent.RECEIVE" />
+                <action android:name="com.parse.push.intent.DELETE" />
+                <action android:name="com.parse.push.intent.OPEN" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.parse.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+                <!--
+                  IMPORTANT: Change "com.parse.starter" to match your app's package name.
+                -->
+                <category android:name="com.example.chandra.getconnected" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

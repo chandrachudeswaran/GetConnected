@@ -243,12 +243,6 @@ public class Chatting extends AppCompatActivity implements ChatMessageAdapter.IC
 
     public void updateConversationHistory(final JSONObject messageHistory, String messageid, final String text, final String senderid, final String receiverid, final boolean image, final boolean first_time) {
 
-        ActivityUtility.Helper.writeErrorLog("message" + messageHistory.toString());
-        ActivityUtility.Helper.writeErrorLog(messageid);
-        ActivityUtility.Helper.writeErrorLog(text);
-        ActivityUtility.Helper.writeErrorLog(senderid);
-        ActivityUtility.Helper.writeErrorLog(receiverid);
-
 
         try {
             JSONArray array = messageHistory.getJSONArray("MessageRoot");
@@ -347,7 +341,7 @@ public class Chatting extends AppCompatActivity implements ChatMessageAdapter.IC
 
 
     @Override
-    public void deleteMessage(ChatMessage chatMessage,int position) {
+    public void deleteMessage(ChatMessage chatMessage, int position) {
 
         displayAlertForDeleteMessage(chatMessage, position);
 
@@ -356,11 +350,11 @@ public class Chatting extends AppCompatActivity implements ChatMessageAdapter.IC
     @Override
     public void onBackPressed() {
         Intent intent = new Intent();
-        setResult(RESULT_OK,intent);
+        setResult(RESULT_OK, intent);
         finish();
     }
 
-    public void displayAlertForDeleteMessage(final ChatMessage chatMessage,final int position) {
+    public void displayAlertForDeleteMessage(final ChatMessage chatMessage, final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(Chatting.this);
         builder.setTitle("Delete Message")
                 .setCancelable(false)
@@ -386,17 +380,15 @@ public class Chatting extends AppCompatActivity implements ChatMessageAdapter.IC
     }
 
 
-    public void deleteFromParse(int position){
+    public void deleteFromParse(int position) {
 
         try {
             JSONArray list = new JSONArray();
             JSONArray jsonArray = (conversationHistory.getJSONArray("MessageRoot"));
             int len = jsonArray.length();
             if (jsonArray != null) {
-                for (int i=0;i<len;i++)
-                {
-                    if (i != position)
-                    {
+                for (int i = 0; i < len; i++) {
+                    if (i != position) {
                         list.put(jsonArray.get(i));
                     }
                 }
@@ -404,12 +396,12 @@ public class Chatting extends AppCompatActivity implements ChatMessageAdapter.IC
             conversationHistory = new JSONObject();
             conversationHistory.put("MessageRoot", list);
             ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.MESSAGES_TABLE);
-            query.whereEqualTo(ParseConstants.OBJECT_ID,currentMessageId);
+            query.whereEqualTo(ParseConstants.OBJECT_ID, currentMessageId);
             query.getFirstInBackground(new GetCallback<ParseObject>() {
                 @Override
                 public void done(ParseObject object, ParseException e) {
-                    if(e==null){
-                        object.put(ParseConstants.MESSAGES_MESSAGES,conversationHistory);
+                    if (e == null) {
+                        object.put(ParseConstants.MESSAGES_MESSAGES, conversationHistory);
                         object.saveInBackground();
                     }
                 }

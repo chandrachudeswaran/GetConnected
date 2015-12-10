@@ -262,8 +262,8 @@ public class ParseAlbumQueryAdapter extends ParseQueryAdapter<ParseObject> {
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
-                if(e==null){
-                    for(ParseObject object:objects){
+                if (e == null) {
+                    for (ParseObject object : objects) {
                         try {
                             object.delete();
                             object.saveInBackground();
@@ -272,7 +272,7 @@ public class ParseAlbumQueryAdapter extends ParseQueryAdapter<ParseObject> {
                         }
                     }
                     deleteAlbum(id);
-                }else{
+                } else {
                     ActivityUtility.Helper.writeErrorLog(e.toString());
                 }
             }
@@ -442,7 +442,7 @@ public class ParseAlbumQueryAdapter extends ParseQueryAdapter<ParseObject> {
     }
 
     public void shareAlbum(ArrayList<ParseUser> usersListDetails) {
-        for (ParseUser sharedUser : usersListDetails) {
+        for (final ParseUser sharedUser : usersListDetails) {
             ParseObject sharedAlbum = new ParseObject(ParseConstants.SHARED_ALBUM_TABLE);
             sharedAlbum.put(ParseConstants.SHARED_ALBUM_POINTER, album);
             sharedAlbum.put(ParseConstants.SHARED_ALBUM_USER, sharedUser);
@@ -452,6 +452,7 @@ public class ParseAlbumQueryAdapter extends ParseQueryAdapter<ParseObject> {
                 public void done(ParseException e) {
                     if (e == null) {
                         ActivityUtility.Helper.makeToast(getContext(), "Album Shared");
+                        createNotificationOnAlbumSharing(sharedUser);
                     } else {
                         ActivityUtility.Helper.writeErrorLog(e.toString());
                     }
@@ -461,6 +462,22 @@ public class ParseAlbumQueryAdapter extends ParseQueryAdapter<ParseObject> {
 
         }
     }
+
+    public void createNotificationOnAlbumSharing(final ParseUser sendApprovalUser){
+        ParseObject notification = new ParseObject(ParseConstants.NOTIFICATIONS_TABLE);
+        notification.put(ParseConstants.NOTIFICATIONS_FROMUSER,ParseUser.getCurrentUser());
+        notification.put(ParseConstants.NOTIFICATIONS_TOUSER, sendApprovalUser);
+        notification.put(ParseConstants.NOTIFICATIONS_MESSAGE, ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME)+ " "+ "shared an album with you");
+        notification.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                ActivityUtility.Helper.sendPushNotification(sendApprovalUser,ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME) + " " + "shared an album with you");
+
+            }
+        });
+    }
+
+
 
 }
 

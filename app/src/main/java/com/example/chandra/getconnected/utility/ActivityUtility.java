@@ -13,6 +13,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
+import com.example.chandra.getconnected.constants.ParseConstants;
+import com.parse.ParseException;
+import com.parse.ParseInstallation;
+import com.parse.ParsePush;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SendCallback;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -64,10 +71,20 @@ public class ActivityUtility {
             ActivityUtility.Helper.makeToast(context, GetConnectedConstants.NO_INTERNET);
         }
 
-        static public  String getTime(long time){
+        static public String getTime(long time) {
             Date date = new Date(time);
             Format format = new SimpleDateFormat("HH:mm");
             return format.format(date);
+        }
+
+        static public void sendPushNotification(ParseUser user, String message) {
+            ParseQuery pushquery = ParseInstallation.getQuery();
+            pushquery.whereEqualTo(ParseConstants.INSTALLATION_USERID, user.getObjectId());
+            ParsePush push = new ParsePush();
+            push.setQuery(pushquery);
+            push.setMessage(message);
+            push.sendInBackground();
+
         }
     }
 }

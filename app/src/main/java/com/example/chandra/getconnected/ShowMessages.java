@@ -13,9 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.example.chandra.getconnected.constants.ParseConstants;
 import com.example.chandra.getconnected.messages.ParseMessageQueryAdapter;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 
 
@@ -93,6 +95,9 @@ public class ShowMessages extends Fragment {
             } else {
                 ParseUser.logOut();
                 onCreateMessages.doFinish();
+                ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+                installation.put(ParseConstants.INSTALLATION_USERID, "");
+                installation.saveInBackground();
             }
         }
 

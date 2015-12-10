@@ -19,9 +19,11 @@ import com.example.chandra.getconnected.albums.Album;
 import com.example.chandra.getconnected.albums.ParseAlbumQueryAdapter;
 import com.example.chandra.getconnected.albums.ParseInvitedAlbumQueryAdapter;
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
+import com.example.chandra.getconnected.constants.ParseConstants;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.parse.ParseFile;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -82,6 +84,9 @@ public class ShowGallery extends Fragment {
                 }
             } else {
                 ParseUser.logOut();
+                ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+                installation.put(ParseConstants.INSTALLATION_USERID, "");
+                installation.saveInBackground();
                 onCreateAlbum.doFinish();
             }
         }

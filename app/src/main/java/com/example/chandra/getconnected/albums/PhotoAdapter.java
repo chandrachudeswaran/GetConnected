@@ -171,15 +171,17 @@ public class PhotoAdapter extends BaseAdapter {
 
     }
 
-    public void createNotificationOnAlbumStatus(String text){
+    public void createNotificationOnAlbumStatus(final String text){
         ParseObject notification = new ParseObject(ParseConstants.NOTIFICATIONS_TABLE);
         notification.put(ParseConstants.NOTIFICATIONS_FROMUSER,ParseUser.getCurrentUser());
-        notification.put(ParseConstants.NOTIFICATIONS_TOUSER,sendApprovalUser);
-        notification.put(ParseConstants.NOTIFICATIONS_MESSAGE, ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME)+ " "+text+ " the photo to the album " + photoBelongToAlbum.getString(ParseConstants.ALBUM_FIELD_TITLE));
+        notification.put(ParseConstants.NOTIFICATIONS_TOUSER, sendApprovalUser);
+        notification.put(ParseConstants.NOTIFICATIONS_MESSAGE, ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME) + " " + text + " the photo to the album " + photoBelongToAlbum.getString(ParseConstants.ALBUM_FIELD_TITLE));
         notification.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                ((IPhotoAdapter) context).finishApproval();
+                ActivityUtility.Helper.sendPushNotification(sendApprovalUser,
+                        ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME) + " " + text + " the photo to the album " + photoBelongToAlbum.getString(ParseConstants.ALBUM_FIELD_TITLE));
+                        ((IPhotoAdapter) context).finishApproval();
             }
         });
     }
@@ -270,4 +272,9 @@ public class PhotoAdapter extends BaseAdapter {
     public interface IPhotoAdapter {
         void finishApproval();
     }
+
+
+
+
+
 }

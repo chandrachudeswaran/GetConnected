@@ -19,7 +19,6 @@ public class GetConnectedConstants {
     public static final String TWITTER_API_CALL_USER = "https://api.twitter.com/1.1/users/show.json?user_id=";
 
     public static final String NEW_USER_MESSAGE = "Welcome";
-    public static final String USER_LOGIN_MESSAGE = "Welcome back";
 
     public static final String MANDATORY_FIELDS_MISSING = "Enter all mandatory fields";
     public static final String PASSWORDS_DONT_MATCH = "Passwords dont match";
@@ -56,14 +55,17 @@ public class GetConnectedConstants {
 
     public static final String REMOVE_PHOTOS_OPTION = "Add Photos";
 
-    public static final String CLASS_USER = "User";
-    public static final String CLASS_ALBUM = "Album";
 
     public static final String JSON_SENDER_LABEL = "senderid";
     public static final String JSON_RECEIVER_LABEL = "receiverid";
     public static final String JSON_MESSAGE_CONTENT = "messagetext";
     public static final String JSON_IMAGE = "imageid";
     public static final String JSON_TIME = "time";
+    public static final String JSON_STATUS = "status";
+
+    public static final String CHAT_STATUS_READ = "read";
+    public static final String CHAT_STATUS_UNREAD = "unread";
+    public static final String CHAT_STATUS_SENT = "sent";
 
 
     public static final String LEFT = "Left";
