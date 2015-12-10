@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.example.chandra.getconnected.R;
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
 import com.example.chandra.getconnected.constants.ParseConstants;
+import com.example.chandra.getconnected.utility.ActivityUtility;
 import com.parse.ParseFile;
 import com.parse.ParseImageView;
 import com.parse.ParseObject;
@@ -18,6 +19,8 @@ import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
+
+import java.lang.reflect.AccessibleObject;
 
 /**
  * Created by chandra on 12/8/2015.
@@ -39,7 +42,11 @@ public class ParseNotificationQueryAdapter extends ParseQueryAdapter<ParseObject
 
     public interface IParseNotificationQueryAdapter {
         void doApprovePhotosForTheAlbum(String photoId, String albumId);
+
         void deleteNotification(String notificationId);
+
+        void showInvitedAlbums();
+
     }
 
     @Override
@@ -48,8 +55,12 @@ public class ParseNotificationQueryAdapter extends ParseQueryAdapter<ParseObject
             v = View.inflate(getContext(), R.layout.gallerylistrow, null);
             toolbar = (Toolbar) v.findViewById(R.id.toolbar);
             if (album.getParseObject(ParseConstants.NOTIFICATIONS_ALBUM) != null) {
-                toolbar.inflateMenu(R.menu.notifications_card_pending_menu);
-            }else{
+                if (album.getParseObject(ParseConstants.NOTIFICATIONS_PHOTOS) != null) {
+                    toolbar.inflateMenu(R.menu.notifications_card_pending_menu);
+                } else {
+                    toolbar.inflateMenu(R.menu.card_share_album);
+                }
+            } else {
                 toolbar.inflateMenu(R.menu.notifications_card_approval_menu);
             }
         }
@@ -67,6 +78,9 @@ public class ParseNotificationQueryAdapter extends ParseQueryAdapter<ParseObject
                 }
                 if (id == R.id.deletenotification) {
                     ((IParseNotificationQueryAdapter) getContext()).deleteNotification(album.getObjectId());
+                }
+                if(id==R.id.view){
+                    ((IParseNotificationQueryAdapter) getContext()).showInvitedAlbums();
                 }
                 return true;
             }

@@ -65,7 +65,7 @@ public class ShowAlbum extends AppCompatActivity implements PhotoAdapter.IPhotoA
 
         photosImpl = new PhotosImpl();
         photosImpl.queryForPhotos(album_id, title, ShowAlbum.this,
-                new ImageListImpl(hint, grid, R.layout.grid_photos, ShowAlbum.this),approve,photoId);
+                new ImageListImpl(hint, grid, R.layout.grid_photos, ShowAlbum.this,remove_photos),approve,photoId);
 
     }
 
@@ -103,7 +103,7 @@ public class ShowAlbum extends AppCompatActivity implements PhotoAdapter.IPhotoA
                         ActivityUtility.Helper.makeToast(getApplicationContext(), "Added Photos will be available after owner's approval");
                     }
                     photosImpl.queryForPhotos(album_id, title, ShowAlbum.this,
-                            new ImageListImpl(hint, grid, R.layout.grid_photos, ShowAlbum.this),approve,photoId);
+                            new ImageListImpl(hint, grid, R.layout.grid_photos, ShowAlbum.this,remove_photos),approve,photoId);
                 }
 
         }

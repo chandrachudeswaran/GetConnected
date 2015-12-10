@@ -74,6 +74,7 @@ public class GetConnectedConstants {
     public static final String OWNED_ALBUM_LABEL = "Owned Albums";
     public static final String INVITED_ALBUM_LABEL = "Invited Albums";
     public static final String PHOTOS_ADDING_BY_OWNER = "Adding by Owner";
+    public static final String PUBLIC_ALBUMS = "Public Albums";
 
 
 }

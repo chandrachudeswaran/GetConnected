@@ -74,7 +74,7 @@ public class CreatePhotoWithAlbum extends AppCompatActivity {
 
 
     public void queryForPhotos() {
-        photosImpl.queryForPhotos(album_id,title,CreatePhotoWithAlbum.this,new ImageListImpl(message,grid,R.layout.grid_photos,CreatePhotoWithAlbum.this),false,null);
+        photosImpl.queryForPhotos(album_id,title,CreatePhotoWithAlbum.this,new ImageListImpl(message,grid,R.layout.grid_photos,CreatePhotoWithAlbum.this,false),false,null);
 
     }
 

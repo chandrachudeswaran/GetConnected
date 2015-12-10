@@ -78,12 +78,17 @@ public class ActivityUtility {
         }
 
         static public void sendPushNotification(ParseUser user, String message) {
-            ParseQuery pushquery = ParseInstallation.getQuery();
-            pushquery.whereEqualTo(ParseConstants.INSTALLATION_USERID, user.getObjectId());
-            ParsePush push = new ParsePush();
-            push.setQuery(pushquery);
-            push.setMessage(message);
-            push.sendInBackground();
+
+            if(user.getBoolean(GetConnectedConstants.USER_RECEIVE_PUSH)) {
+                ParseQuery pushquery = ParseInstallation.getQuery();
+                pushquery.whereEqualTo(ParseConstants.INSTALLATION_USERID, user.getObjectId());
+                ParsePush push = new ParsePush();
+                push.setQuery(pushquery);
+                push.setMessage(message);
+                push.sendInBackground();
+            }else{
+                ActivityUtility.Helper.writeErrorLog("User configured not to recieve push");
+            }
 
         }
     }

@@ -19,6 +19,12 @@
 
 
     <item
+        android:id="@+id/showpublic"
+        android:orderInCategory="100"
+        android:title="Show Public Albums"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/logout"
         android:orderInCategory="100"
         android:title="Logout"

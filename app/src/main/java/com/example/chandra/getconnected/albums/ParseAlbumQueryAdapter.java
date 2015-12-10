@@ -452,7 +452,7 @@ public class ParseAlbumQueryAdapter extends ParseQueryAdapter<ParseObject> {
                 public void done(ParseException e) {
                     if (e == null) {
                         ActivityUtility.Helper.makeToast(getContext(), "Album Shared");
-                        createNotificationOnAlbumSharing(sharedUser);
+                        createNotificationOnAlbumSharing(sharedUser,album);
                     } else {
                         ActivityUtility.Helper.writeErrorLog(e.toString());
                     }
@@ -463,10 +463,11 @@ public class ParseAlbumQueryAdapter extends ParseQueryAdapter<ParseObject> {
         }
     }
 
-    public void createNotificationOnAlbumSharing(final ParseUser sendApprovalUser){
+    public void createNotificationOnAlbumSharing(final ParseUser sendApprovalUser,final ParseObject album){
         ParseObject notification = new ParseObject(ParseConstants.NOTIFICATIONS_TABLE);
         notification.put(ParseConstants.NOTIFICATIONS_FROMUSER,ParseUser.getCurrentUser());
         notification.put(ParseConstants.NOTIFICATIONS_TOUSER, sendApprovalUser);
+        notification.put(ParseConstants.NOTIFICATIONS_ALBUM,album);
         notification.put(ParseConstants.NOTIFICATIONS_MESSAGE, ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME)+ " "+ "shared an album with you");
         notification.saveInBackground(new SaveCallback() {
             @Override

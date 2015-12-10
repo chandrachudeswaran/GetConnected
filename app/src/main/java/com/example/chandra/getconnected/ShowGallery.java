@@ -18,8 +18,10 @@ import android.widget.TextView;
 import com.example.chandra.getconnected.albums.Album;
 import com.example.chandra.getconnected.albums.ParseAlbumQueryAdapter;
 import com.example.chandra.getconnected.albums.ParseInvitedAlbumQueryAdapter;
+import com.example.chandra.getconnected.albums.ParsePublicAlbumQueryAdapter;
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
 import com.example.chandra.getconnected.constants.ParseConstants;
+import com.example.chandra.getconnected.utility.ActivityUtility;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.parse.ParseFile;
@@ -90,6 +92,9 @@ public class ShowGallery extends Fragment {
                 onCreateAlbum.doFinish();
             }
         }
+        if (id == R.id.showpublic) {
+            queryAllPublicAlbum();
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -151,5 +156,13 @@ public class ShowGallery extends Fragment {
         owner.setText(GetConnectedConstants.INVITED_ALBUM_LABEL);
         listView.setAdapter(parseInvitedAlbumQueryAdapter);
         parseInvitedAlbumQueryAdapter.notifyDataSetChanged();
+    }
+
+
+    public void queryAllPublicAlbum() {
+        ParsePublicAlbumQueryAdapter parsePublicAlbumQueryAdapter = new ParsePublicAlbumQueryAdapter(context);
+        owner.setText(GetConnectedConstants.PUBLIC_ALBUMS);
+        listView.setAdapter(parsePublicAlbumQueryAdapter);
+        parsePublicAlbumQueryAdapter.notifyDataSetChanged();
     }
 }

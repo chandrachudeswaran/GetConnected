@@ -1,6 +1,7 @@
 package com.example.chandra.getconnected;
 
 import android.app.AlertDialog;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.CoordinatorLayout;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 
 import com.example.chandra.getconnected.albums.ParseAlbumQueryAdapter;
 import com.example.chandra.getconnected.albums.ParseInvitedAlbumQueryAdapter;
+import com.example.chandra.getconnected.albums.ParsePublicAlbumQueryAdapter;
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
 import com.example.chandra.getconnected.constants.ParseConstants;
 import com.example.chandra.getconnected.messages.ParseMessageQueryAdapter;
@@ -44,7 +46,7 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
         ParseUserQueryAdapter.IParseUserQueryAdapter, ParseAlbumQueryAdapter.IParseAlbumQueryAdapter,
         ParseMessageQueryAdapter.IParseMessageQueryAdapter,
         ParseInvitedAlbumQueryAdapter.IParseInvitedAlbumQueryAdapter,
-        ParseNotificationQueryAdapter.IParseNotificationQueryAdapter {
+        ParseNotificationQueryAdapter.IParseNotificationQueryAdapter,ParsePublicAlbumQueryAdapter.IParsePublicAlbum {
 
     private Toolbar mToolbar;
     private CoordinatorLayout coordinatorLayout;
@@ -321,6 +323,21 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
     @Override
     public void deleteEntireThread() {
 
+    }
+
+    @Override
+    public void showInvitedAlbums() {
+        //After sharing show the invited album. Replace the notification fragment with Gallery Fragment
+        viewPager.setCurrentItem(3);
+        gallery.queryInvitedAlbum();
+    }
+
+    @Override
+    public void showAllPhotos(String objectId) {
+        Intent intent = new Intent(Home.this, ShowAlbum.class);
+        intent.putExtra(ParseConstants.ALBUM_TABLE, objectId);
+        intent.putExtra(GetConnectedConstants.REMOVE_PHOTOS_OPTION,true);
+        startActivity(intent);
     }
 
     public void addPhotosToAllAlbum(String objectId, boolean addingByOwner) {
