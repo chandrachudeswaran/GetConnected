@@ -57,7 +57,7 @@ public class ChatMessageAdapter extends ArrayAdapter {
             @Override
             public boolean onLongClick(View v) {
 
-                ((IChatMessageAdapter)context).deleteMessage(objects.get(position),position);
+                ((IChatMessageAdapter) context).deleteMessage(objects.get(position), position);
                 return true;
             }
         });
@@ -67,12 +67,14 @@ public class ChatMessageAdapter extends ArrayAdapter {
 
         if (objects.get(position).isImage()) {
 
-            CardView card = new CardView(getContext());
+            final CardView card = new CardView(getContext());
             ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             card.setLayoutParams(layoutParams);
 
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams cardparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             LinearLayout parentLayout = new LinearLayout(getContext());
+            parentLayout.setOrientation(LinearLayout.VERTICAL);
             parentLayout.setLayoutParams(params);
             parentLayout.setOrientation(LinearLayout.VERTICAL);
 
@@ -86,7 +88,22 @@ public class ChatMessageAdapter extends ArrayAdapter {
 
             final ParseImageView imageview1 = new ParseImageView(getContext());
             if (objects.get(position).getPosition().equals(GetConnectedConstants.LEFT)) {
-                card.setBackgroundColor(Color.parseColor("#ffffff"));
+
+                if (objects.get(position).getStatus().equals(GetConnectedConstants.CHAT_STATUS_UNREAD)) {
+                    card.setBackgroundColor(Color.parseColor("#AED581"));
+                    card.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            objects.get(position).setStatus(GetConnectedConstants.CHAT_STATUS_READ);
+                            card.setBackgroundColor(Color.parseColor("#ffffff"));
+                            notifyDataSetChanged();
+                            updateReadStatus(position);
+                        }
+                    });
+
+                } else {
+                    card.setBackgroundColor(Color.parseColor("#ffffff"));
+                }
                 params.gravity = Gravity.LEFT;
             } else {
                 params.gravity = Gravity.RIGHT;
@@ -96,7 +113,7 @@ public class ChatMessageAdapter extends ArrayAdapter {
             imageview1.getLayoutParams().height = 500;
             imageview1.getLayoutParams().width = 450;
             imageview1.setLayoutParams(params);
-            card.setLayoutParams(params);
+            card.setLayoutParams(cardparams);
             if (objects.get(position).isNew()) {
                 SharedPreferenceHelper helper = new SharedPreferenceHelper();
                 String imageString = helper.loadFromSharedPreference(getContext(), objects.get(position).getImageid());
@@ -117,14 +134,16 @@ public class ChatMessageAdapter extends ArrayAdapter {
                     }
                 });
 
-                parentLayout.addView(imageview1);
+                card.addView(imageview1);
+                //card.addView(time);
+                parentLayout.addView(card);
                 parentLayout.addView(time);
-                //card.addView(parentLayout);
                 layout.addView(parentLayout);
+
             }
         } else {
 
-            CardView card = new CardView(getContext());
+            final CardView card = new CardView(getContext());
             ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             card.setLayoutParams(layoutParams);
 
@@ -149,7 +168,21 @@ public class ChatMessageAdapter extends ArrayAdapter {
 
             if (objects.get(position).getPosition().equals(GetConnectedConstants.LEFT)) {
 
-                card.setBackgroundColor(Color.parseColor("#ffffff"));
+                if (objects.get(position).getStatus().equals(GetConnectedConstants.CHAT_STATUS_UNREAD)) {
+                    card.setBackgroundColor(Color.parseColor("#AED581"));
+                    card.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            objects.get(position).setStatus(GetConnectedConstants.CHAT_STATUS_READ);
+                            card.setBackgroundColor(Color.parseColor("#ffffff"));
+                            notifyDataSetChanged();
+                            updateReadStatus(position);
+                        }
+                    });
+                } else {
+                    card.setBackgroundColor(Color.parseColor("#ffffff"));
+                }
+
                 params.gravity = Gravity.LEFT;
                 card.setLayoutParams(params);
             } else {
@@ -166,7 +199,14 @@ public class ChatMessageAdapter extends ArrayAdapter {
         return convertView;
     }
 
-    public interface IChatMessageAdapter{
-        public void deleteMessage(ChatMessage chatMessage,int index);
+    public interface IChatMessageAdapter {
+        void deleteMessage(ChatMessage chatMessage, int index);
+
+        void updateReadMessage(int position);
+    }
+
+
+    public void updateReadStatus(int position) {
+        ((IChatMessageAdapter) context).updateReadMessage(position);
     }
 }

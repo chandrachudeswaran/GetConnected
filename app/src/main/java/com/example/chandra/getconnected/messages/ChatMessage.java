@@ -14,6 +14,7 @@ public class ChatMessage {
     boolean isNew;
     String imageid;
     String time;
+    String status;
 
     public String getPosition() {
         return position;
@@ -69,6 +70,14 @@ public class ChatMessage {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override

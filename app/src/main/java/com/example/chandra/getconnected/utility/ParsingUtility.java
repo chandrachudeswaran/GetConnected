@@ -48,6 +48,11 @@ public class ParsingUtility {
 
                 } else {
                     chatMessage.setPosition(GetConnectedConstants.LEFT);
+                    if(obj.getString(GetConnectedConstants.JSON_STATUS).equals(GetConnectedConstants.CHAT_STATUS_UNREAD)){
+                        chatMessage.setStatus(GetConnectedConstants.CHAT_STATUS_UNREAD);
+                    }else{
+                        chatMessage.setStatus(GetConnectedConstants.CHAT_STATUS_READ);
+                    }
 
                 }
 
