@@ -1,6 +1,8 @@
 package com.example.chandra.getconnected;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
@@ -23,11 +25,13 @@ import android.widget.ImageView;
 
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.parse.FindCallback;
 import com.parse.LogInCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseInstallation;
+import com.parse.ParseQuery;
 import com.parse.ParseTwitterUtils;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -71,9 +75,12 @@ public class MainActivity extends AppCompatActivity {
     String first_name;
     String last_name;
     String gender;
+    ArrayList<Integer> privacy_settings;
     TwitterLoginButton tweets;
     String id;
     ProgressDialog dialog;
+    boolean user_listed = false;
+    boolean receive_push = false;
     String url_facebook;
     public static final List<String> facebook_Permissions = new ArrayList<String>() {{
         add(GetConnectedConstants.FACEBOOK_PERMISSION_PUBLIC);
@@ -125,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
                             } else if (user.isNew()) {
                                 new TwitterLogin().execute(GetConnectedConstants.TWITTER_API_CALL_USER + ParseTwitterUtils.getTwitter().getUserId());
                             } else {
-                                new TwitterLogin().execute(GetConnectedConstants.TWITTER_API_CALL_USER + ParseTwitterUtils.getTwitter().getUserId());
+                                showHome();
                             }
                         }
                     });
@@ -192,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
                     first_name = jsonObject.getString("first_name");
                     last_name = jsonObject.getString("last_name");
                     gender = jsonObject.getString("gender");
-                    id=jsonObject.getString("id");
+                    id = jsonObject.getString("id");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -224,10 +231,10 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-    private class TwitterLogin extends AsyncTask<String, Void, String> {
+    private class TwitterLogin extends AsyncTask<String, Void, ParseUser> {
 
         @Override
-        protected String doInBackground(String... params) {
+        protected ParseUser doInBackground(String... params) {
             HttpUriRequest request = new HttpGet(params[0]);
             Twitter twitter1 = ParseTwitterUtils.getTwitter();
             twitter1.signRequest(request);
@@ -240,23 +247,28 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject JsonResponse = new JSONObject(result);
                 ParseUser user = ParseUser.getCurrentUser();
                 user.setUsername(JsonResponse.getString("name"));
-                user.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e == null) {
-                            showHome();
-                        } else {
-                            ActivityUtility.Helper.writeErrorLog(e.toString());
-                        }
-                    }
-                });
-                return result;
+                String[] array = JsonResponse.getString("name").split(" ");
+                user.put(GetConnectedConstants.USER_FIRST_NAME, array[0]);
+                if (array.length > 1) {
+                    user.put(GetConnectedConstants.USER_LAST_NAME, array[1]);
+                }else{
+                    user.put(GetConnectedConstants.USER_LAST_NAME,"");
+                }
+                user.put(GetConnectedConstants.USER_IMAGE_FACEBOOK, JsonResponse.getString("profile_image_url"));
+
+
+                return user;
             } catch (IOException e1) {
                 e1.printStackTrace();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(ParseUser user) {
+            displayUserSettingsForTwitterLogin(user);
         }
     }
 
@@ -300,14 +312,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void getProfilePictureFromFacebook(){
+    public void getProfilePictureFromFacebook() {
 
         new TaskUtil().execute("https://graph.facebook.com/" + id + "/picture?width=250&height=250&redirect=false");
 
     }
 
 
-    private class TaskUtil extends AsyncTask<String, Void, String > {
+    private class TaskUtil extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -339,7 +351,7 @@ public class MainActivity extends AppCompatActivity {
             user.setUsername(username);
             user.put(GetConnectedConstants.USER_FIRST_NAME, first_name);
             user.put(GetConnectedConstants.USER_LAST_NAME, last_name);
-            user.put(GetConnectedConstants.USER_IMAGE_FACEBOOK,url_facebook);
+            user.put(GetConnectedConstants.USER_IMAGE_FACEBOOK, url_facebook);
             if (gender.equalsIgnoreCase("male")) {
                 gender = GetConnectedConstants.MALE;
             } else {
@@ -347,24 +359,141 @@ public class MainActivity extends AppCompatActivity {
             }
             user.put(GetConnectedConstants.USER_GENDER, gender);
             user.setEmail(email);
-            user.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e == null) {
-                        showHome();
+            displayUserPreferenceSettings(user);
 
-                    } else {
-                        ActivityUtility.Helper.writeErrorLog(e.toString());
+
+        }
+
+    }
+
+    public void displayUserSettingsForTwitterLogin(final ParseUser user) {
+        privacy_settings = new ArrayList<>();
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("User Profile and Settings")
+                .setCancelable(false)
+                .setMultiChoiceItems(GetConnectedConstants.TWITTER_PRIVACY_SETTINGS, null, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        if (isChecked) {
+                            privacy_settings.add(which);
+                        } else {
+                            privacy_settings.remove(which);
+                        }
                     }
+                }).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                populatePrivacySettingsForTwitter(user);
+            }
+        });
+        builder.create().show();
+    }
+
+    public void displayUserPreferenceSettings(final ParseUser user) {
+
+        privacy_settings = new ArrayList<>();
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("User Preference Settings")
+                .setCancelable(false)
+                .setMultiChoiceItems(GetConnectedConstants.PRIVACY_SETTINGS, null, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        if (isChecked) {
+                            privacy_settings.add(which);
+                        } else {
+                            privacy_settings.remove(which);
+                        }
+                    }
+                }).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                populatePrivacySettings(user);
+            }
+        });
+        builder.create().show();
+    }
+
+    public void populatePrivacySettings(ParseUser user) {
+
+        for (Integer i : privacy_settings) {
+
+            if (i == 0) {
+                user_listed = true;
+            }
+            if (i == 1) {
+                receive_push = true;
+            }
+        }
+        user.put(GetConnectedConstants.USER_LISTED, user_listed);
+        user.put(GetConnectedConstants.USER_RECEIVE_PUSH, receive_push);
+        user.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    sendNotificationToOtherUsers();
+
+                } else {
+                    ActivityUtility.Helper.writeErrorLog(e.toString());
                 }
-            });
+            }
+        });
 
+    }
 
+    public void populatePrivacySettingsForTwitter(ParseUser user) {
+
+        for (Integer i : privacy_settings) {
+            if (i == 0) {
+                gender = GetConnectedConstants.MALE;
+            }
+            if (i == 1) {
+                user_listed = true;
+            }
+            if (i == 2) {
+                receive_push = true;
+            }
         }
-
+        if (gender != null) {
+            user.put(GetConnectedConstants.USER_GENDER, gender);
+        } else {
+            user.put(GetConnectedConstants.USER_GENDER, GetConnectedConstants.FEMALE);
         }
+        user.put(GetConnectedConstants.USER_LISTED, user_listed);
+        user.put(GetConnectedConstants.USER_RECEIVE_PUSH, receive_push);
+        user.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    sendNotificationToOtherUsers();
 
+                } else {
+                    ActivityUtility.Helper.writeErrorLog(e.toString());
+                }
+            }
+        });
 
+    }
+
+    public void sendNotificationToOtherUsers() {
+
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereNotEqualTo(ParseConstants.OBJECT_ID, ParseUser.getCurrentUser().getObjectId());
+        query.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                if (e == null) {
+                    for (ParseUser user : objects) {
+                        ActivityUtility.Helper.callPushNotification(user, ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME) + " " + "has joined GetConnected", GetConnectedConstants.EVENT_MESSAGING);
+                    }
+
+                } else {
+                    ActivityUtility.Helper.writeErrorLog(e.toString());
+                }
+            }
+        });
+
+        showHome();
+    }
 
 
 }

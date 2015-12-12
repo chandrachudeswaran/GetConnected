@@ -185,7 +185,6 @@ public class Signup extends AppCompatActivity implements RadioGroup.OnCheckedCha
                     if (e == null) {
                         sendNotificationToOtherUsers();
                     } else {
-                        ActivityUtility.Helper.writeErrorLog(e.toString());
                         ActivityUtility.Helper.makeToast(Signup.this, "Signup failed");
                     }
 

@@ -52,6 +52,7 @@ public class GetConnectedConstants {
     public static final String NO_INTERNET = "No Network found.Please swicth on Data";
 
     public static final CharSequence[] PRIVACY_SETTINGS = {"Listed User", "Receive Push Notifications"};
+    public static final CharSequence[] TWITTER_PRIVACY_SETTINGS = {"MALE","Listed User", "Receive Push Notifications"};
 
     public static final String REMOVE_PHOTOS_OPTION = "Add Photos";
 
