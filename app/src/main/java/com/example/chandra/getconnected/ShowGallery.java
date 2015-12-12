@@ -3,6 +3,7 @@ package com.example.chandra.getconnected;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import android.support.v4.app.Fragment;
@@ -96,6 +97,10 @@ public class ShowGallery extends Fragment {
             queryAllPublicAlbum();
         }
 
+        if(id==R.id.editprofile){
+            ((IGallery)context).editProfile();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -164,5 +169,9 @@ public class ShowGallery extends Fragment {
         owner.setText(GetConnectedConstants.PUBLIC_ALBUMS);
         listView.setAdapter(parsePublicAlbumQueryAdapter);
         parsePublicAlbumQueryAdapter.notifyDataSetChanged();
+    }
+
+    public interface IGallery{
+        public void editProfile();
     }
 }

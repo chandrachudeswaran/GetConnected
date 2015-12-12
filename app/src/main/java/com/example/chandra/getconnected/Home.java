@@ -43,7 +43,7 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
         ParseUserQueryAdapter.IParseUserQueryAdapter, ParseAlbumQueryAdapter.IParseAlbumQueryAdapter,
         ParseMessageQueryAdapter.IParseMessageQueryAdapter,
         ParseInvitedAlbumQueryAdapter.IParseInvitedAlbumQueryAdapter,
-        ParseNotificationQueryAdapter.IParseNotificationQueryAdapter, ParsePublicAlbumQueryAdapter.IParsePublicAlbum {
+        ParseNotificationQueryAdapter.IParseNotificationQueryAdapter, ParsePublicAlbumQueryAdapter.IParsePublicAlbum,ShowGallery.IGallery{
 
     private Toolbar mToolbar;
     private CoordinatorLayout coordinatorLayout;
@@ -240,6 +240,12 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
         finish();
     }
 
+
+    @Override
+    public void editProfile() {
+        Intent intent = new Intent(Home.this,EditProfile.class);
+        startActivity(intent);
+    }
 
     @Override
     public void callProfileViewForUser(String objectId) {

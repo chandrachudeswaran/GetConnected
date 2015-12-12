@@ -38,6 +38,7 @@ import com.parse.SaveCallback;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+
 //Creating and Updating Album
 public class AlbumActivity extends AppCompatActivity {
     private Toolbar mToolbar;
@@ -54,6 +55,7 @@ public class AlbumActivity extends AppCompatActivity {
     ParseFile imageParseFile;
     ParseImageView coverPic;
     Bitmap picture;
+    ParseFile parseFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +69,7 @@ public class AlbumActivity extends AppCompatActivity {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         public_button = (RadioButton) findViewById(R.id.publicalbum);
         private_button = (RadioButton) findViewById(R.id.privatealbum);
-        coverPic=(ParseImageView)findViewById(R.id.cover);
+        coverPic = (ParseImageView) findViewById(R.id.cover);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setTitle("Create Album");
@@ -90,12 +92,12 @@ public class AlbumActivity extends AppCompatActivity {
                 album.put(ParseConstants.ALBUM_FIELD_TITLE, title);
                 album.put(ParseConstants.ALBUM_FIELD_OWNER, ParseUser.getCurrentUser());
                 album.put(ParseConstants.ALBUM_FIELD_OWNER_ID, ParseUser.getCurrentUser().getObjectId());
-                if(picture==null) {
+                if (picture == null) {
                     imageParseFile = (PhotoUtility.getParseFileFromBitmap(BitmapFactory.decodeResource
                             (AlbumActivity.this.getResources(),
                                     R.drawable.no_image)));
-                }else{
-                    imageParseFile=PhotoUtility.getParseFileFromBitmap(picture);
+                } else {
+                    imageParseFile = PhotoUtility.getParseFileFromBitmap(picture);
                 }
                 new Upload().execute(imageParseFile);
             }
@@ -141,7 +143,7 @@ public class AlbumActivity extends AppCompatActivity {
                     album.getParseFile(ParseConstants.ALBUM_FIEELD_COVER).getDataInBackground(new GetDataCallback() {
                         @Override
                         public void done(byte[] data, ParseException e) {
-                         coverPic.setImageBitmap(PhotoUtility.decodeSampledBitmap(data));
+                            coverPic.setImageBitmap(PhotoUtility.decodeSampledBitmap(data));
                         }
                     });
 
@@ -151,11 +153,12 @@ public class AlbumActivity extends AppCompatActivity {
     }
 
     public void updateAlbum() {
+        displayDialog();
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.ALBUM_TABLE);
         query.whereEqualTo(ParseConstants.OBJECT_ID, album_id);
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
-            public void done(ParseObject object, ParseException e) {
+            public void done(final ParseObject object, ParseException e) {
                 if (e == null) {
                     int checkedId = privacy.getCheckedRadioButtonId();
                     if (checkedId == R.id.privatealbum) {
@@ -165,21 +168,57 @@ public class AlbumActivity extends AppCompatActivity {
                     }
                     object.put(ParseConstants.ALBUM_FIELD_ISPUBLIC, isPublic);
                     object.put(ParseConstants.ALBUM_FIELD_TITLE, album_title.getText().toString());
-
-                    object.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e == null) {
-                                Intent intent = new Intent();
-                                setResult(RESULT_OK, intent);
-                                finish();
+                    if (picture != null) {
+                        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        picture.compress(Bitmap.CompressFormat.PNG, 0, stream);
+                        byte[] image = stream.toByteArray();
+                        parseFile = new ParseFile("thumbnail.png", image);
+                        parseFile.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    object.put(ParseConstants.ALBUM_FIEELD_COVER, parseFile);
+                                    object.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e == null) {
+                                                dialog.dismiss();
+                                                Intent intent = new Intent();
+                                                setResult(RESULT_OK, intent);
+                                                finish();
+                                            }
+                                        }
+                                    });
+                                }
                             }
-                        }
-                    });
+                        });
+                    } else {
 
+                        object.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    dialog.dismiss();
+                                    Intent intent = new Intent();
+                                    setResult(RESULT_OK, intent);
+                                    finish();
+                                }
+                            }
+                        });
+
+                    }
+                }else{
+                    ActivityUtility.Helper.writeErrorLog(e.toString());
                 }
             }
         });
+    }
+
+    public void displayDialog(){
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("Editing Album");
+        dialog.setCancelable(false);
+        dialog.show();
     }
 
     public void uploadCoverPic(View view) {
