@@ -65,7 +65,6 @@ public class GetConnectedConstants {
 
     public static final String CHAT_STATUS_READ = "read";
     public static final String CHAT_STATUS_UNREAD = "unread";
-    public static final String CHAT_STATUS_SENT = "sent";
 
 
     public static final String LEFT = "Left";
@@ -75,6 +74,18 @@ public class GetConnectedConstants {
     public static final String INVITED_ALBUM_LABEL = "Invited Albums";
     public static final String PHOTOS_ADDING_BY_OWNER = "Adding by Owner";
     public static final String PUBLIC_ALBUMS = "Public Albums";
+
+    //Push Notifications Constants
+    public static final String SHOW_HOME = "android.intent.action.Home";
+    public static final String PARSE_DATA = "com.parse.Data";
+    public static final String ALBUM_SHARE = "Album Share";
+    public static final String PHOTO_ADDED = "Photo Added";
+    public static final String EVENT_ALBUM_SHARE = "Event_Album_Share";
+    public static final String EVENT_PHOTO_ADDED = "Event_Photo_Added";
+    public static final String EVENT_MESSAGING = "Event_Messaging";
+    public static final String MESSAGING = "Messaging";
+    public static final String SIGNUP = "Signup";
+    public static final String EVENT_SIGNUP = "Event_Signup";
 
 
 }

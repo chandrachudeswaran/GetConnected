@@ -14,8 +14,9 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
-    <permission android:protectionLevel="signature"
-        android:name="com.parse.starter.permission.C2D_MESSAGE" />
+    <permission
+        android:name="com.example.chandra.getconnected.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
     <uses-permission android:name="com.example.chandra.getconnected.permission.C2D_MESSAGE" />
 
     <application
@@ -54,7 +55,14 @@
             android:label="@string/title_activity_signup"></activity>
         <activity
             android:name=".Home"
-            android:label="@string/title_activity_home"></activity>
+            android:label="@string/title_activity_home">
+
+            <intent-filter>
+                <action android:name="android.intent.action.Home" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".AlbumActivity"
             android:label="@string/title_activity_album"></activity>
@@ -86,7 +94,7 @@
         <service android:name="com.parse.PushService" />
 
         <receiver
-            android:name="com.parse.ParsePushBroadcastReceiver"
+            android:name="com.example.chandra.getconnected.utility.PushUtility"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />

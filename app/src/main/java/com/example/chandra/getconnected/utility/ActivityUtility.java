@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
 import com.example.chandra.getconnected.constants.ParseConstants;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParsePush;
@@ -24,6 +26,8 @@ import com.parse.SendCallback;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by chandra on 11/23/2015.
@@ -77,19 +81,76 @@ public class ActivityUtility {
             return format.format(date);
         }
 
-        static public void sendPushNotification(ParseUser user, String message) {
 
-            if(user.getBoolean(GetConnectedConstants.USER_RECEIVE_PUSH)) {
-                ParseQuery pushquery = ParseInstallation.getQuery();
-                pushquery.whereEqualTo(ParseConstants.INSTALLATION_USERID, user.getObjectId());
-                ParsePush push = new ParsePush();
-                push.setQuery(pushquery);
-                push.setMessage(message);
-                push.sendInBackground();
-            }else{
-                ActivityUtility.Helper.writeErrorLog("User configured not to recieve push");
+        static public void callPushNotification(ParseUser receiverUser, String message, String event) {
+
+            if (event.equals(GetConnectedConstants.EVENT_ALBUM_SHARE)) {
+                if (receiverUser.getBoolean(GetConnectedConstants.USER_RECEIVE_PUSH)) {
+                    Map<String, String> lNotificationMap = new HashMap<>();
+                    lNotificationMap.put("toUser", receiverUser.getObjectId());
+                    lNotificationMap.put("fromUser", ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME));
+                    lNotificationMap.put("message", message);
+                    lNotificationMap.put("type", GetConnectedConstants.ALBUM_SHARE);
+                    ParseCloud.callFunctionInBackground("notifyPush", lNotificationMap, new FunctionCallback<Object>() {
+                        @Override
+                        public void done(Object object, ParseException e) {
+                            if (e == null) {
+                            } else e.printStackTrace();
+                        }
+                    });
+                }
             }
 
+            if(event.equals(GetConnectedConstants.EVENT_PHOTO_ADDED)){
+                if (receiverUser.getBoolean(GetConnectedConstants.USER_RECEIVE_PUSH)) {
+                    Map<String, String> lNotificationMap = new HashMap<>();
+                    lNotificationMap.put("toUser", receiverUser.getObjectId());
+                    lNotificationMap.put("fromUser", ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME));
+                    lNotificationMap.put("message", message);
+                    lNotificationMap.put("type", GetConnectedConstants.PHOTO_ADDED);
+                    ParseCloud.callFunctionInBackground("notifyPushForPhoto", lNotificationMap, new FunctionCallback<Object>() {
+                        @Override
+                        public void done(Object object, ParseException e) {
+                            if (e == null) {
+                            } else e.printStackTrace();
+                        }
+                    });
+                }
+            }
+
+            if(event.equals(GetConnectedConstants.EVENT_MESSAGING)){
+                if (receiverUser.getBoolean(GetConnectedConstants.USER_RECEIVE_PUSH)) {
+                    Map<String, String> lNotificationMap = new HashMap<>();
+                    lNotificationMap.put("toUser", receiverUser.getObjectId());
+                    lNotificationMap.put("fromUser", ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME));
+                    lNotificationMap.put("message", message);
+                    lNotificationMap.put("type", GetConnectedConstants.MESSAGING);
+                    ParseCloud.callFunctionInBackground("notifyPushForMessage", lNotificationMap, new FunctionCallback<Object>() {
+                        @Override
+                        public void done(Object object, ParseException e) {
+                            if (e == null) {
+                            } else e.printStackTrace();
+                        }
+                    });
+                }
+            }
+
+            if(event.equals(GetConnectedConstants.EVENT_SIGNUP)){
+                if (receiverUser.getBoolean(GetConnectedConstants.USER_RECEIVE_PUSH)) {
+                    Map<String, String> lNotificationMap = new HashMap<>();
+                    lNotificationMap.put("toUser", receiverUser.getObjectId());
+                    lNotificationMap.put("fromUser", ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME));
+                    lNotificationMap.put("message", message);
+                    lNotificationMap.put("type", GetConnectedConstants.SIGNUP);
+                    ParseCloud.callFunctionInBackground("notifyPushForMessage", lNotificationMap, new FunctionCallback<Object>() {
+                        @Override
+                        public void done(Object object, ParseException e) {
+                            if (e == null) {
+                            } else e.printStackTrace();
+                        }
+                    });
+                }
+            }
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.example.chandra.getconnected;
 
 import android.app.AlertDialog;
-import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.CoordinatorLayout;
@@ -33,8 +32,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -46,7 +43,7 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
         ParseUserQueryAdapter.IParseUserQueryAdapter, ParseAlbumQueryAdapter.IParseAlbumQueryAdapter,
         ParseMessageQueryAdapter.IParseMessageQueryAdapter,
         ParseInvitedAlbumQueryAdapter.IParseInvitedAlbumQueryAdapter,
-        ParseNotificationQueryAdapter.IParseNotificationQueryAdapter,ParsePublicAlbumQueryAdapter.IParsePublicAlbum {
+        ParseNotificationQueryAdapter.IParseNotificationQueryAdapter, ParsePublicAlbumQueryAdapter.IParsePublicAlbum {
 
     private Toolbar mToolbar;
     private CoordinatorLayout coordinatorLayout;
@@ -96,7 +93,18 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
         tabLayout.setupWithViewPager(viewPager);
         setupTabIcons();
 
+        if (getIntent().getExtras() != null) {
 
+            if(getIntent().getExtras().getString(GetConnectedConstants.ALBUM_SHARE)!=null) {
+                viewPager.setCurrentItem(2);
+            }
+            if(getIntent().getExtras().getString(GetConnectedConstants.PHOTO_ADDED)!=null){
+                viewPager.setCurrentItem(2);
+            }
+            if(getIntent().getExtras().getString(GetConnectedConstants.MESSAGING)!=null){
+                viewPager.setCurrentItem(1);
+            }
+        }
     }
 
     public void createAlbum(MenuItem item) {
@@ -308,6 +316,7 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
             }
         });
     }
+
     @Override
     public void showMessages(JSONObject message, String other_person, String objectId) {
         Intent intent = new Intent(Home.this, Chatting.class);
@@ -336,7 +345,7 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
     public void showAllPhotos(String objectId) {
         Intent intent = new Intent(Home.this, ShowAlbum.class);
         intent.putExtra(ParseConstants.ALBUM_TABLE, objectId);
-        intent.putExtra(GetConnectedConstants.REMOVE_PHOTOS_OPTION,true);
+        intent.putExtra(GetConnectedConstants.REMOVE_PHOTOS_OPTION, true);
         startActivity(intent);
     }
 
@@ -391,8 +400,6 @@ public class Home extends AppCompatActivity implements ShowGallery.OnCreateAlbum
                 });
         builder.create().show();
     }
-
-
 
 
     public void queryUserObject(String id) {

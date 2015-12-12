@@ -97,7 +97,7 @@ public class Chatting extends AppCompatActivity implements ChatMessageAdapter.IC
             } else {
                 other_person_id = obj.getString("senderid");
             }
-            ActivityUtility.Helper.writeErrorLog("other"+""+other_person_id);
+            ActivityUtility.Helper.writeErrorLog("other" + "" + other_person_id);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -152,7 +152,7 @@ public class Chatting extends AppCompatActivity implements ChatMessageAdapter.IC
             displayChat();
             //After displaying update Parse.com
             if (conversationHistory != null) {
-                getPersonOtherObjectForNotification(other_person_id,text);
+                getPersonOtherObjectForNotification(other_person_id, text);
 
 
             } else {
@@ -162,15 +162,15 @@ public class Chatting extends AppCompatActivity implements ChatMessageAdapter.IC
         }
     }
 
-    public void getPersonOtherObjectForNotification(String objectId,final String text){
+    public void getPersonOtherObjectForNotification(String objectId, final String text) {
         ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.whereEqualTo(ParseConstants.OBJECT_ID,objectId);
+        query.whereEqualTo(ParseConstants.OBJECT_ID, objectId);
         query.getFirstInBackground(new GetCallback<ParseUser>() {
             @Override
             public void done(ParseUser object, ParseException e) {
-                if(e==null){
-                    other_person_object=object;
-                     ActivityUtility.Helper.sendPushNotification(other_person_object,"You received a message from "+ ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME));
+                if (e == null) {
+                    other_person_object = object;
+                    callMessagingEventPushNotification();
                     updateConversationHistory(conversationHistory, currentMessageId, text, ParseUser.getCurrentUser().getObjectId(), other_person_id, false, true);
                 }
             }
@@ -186,12 +186,16 @@ public class Chatting extends AppCompatActivity implements ChatMessageAdapter.IC
                 if (e == null) {
                     other_person_object = object;
                     other_person_id = other_person_object.getObjectId();
-                    ActivityUtility.Helper.sendPushNotification(other_person_object,"You received a message from " + ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME));
+                    callMessagingEventPushNotification();
                     createNewJsonMessage(ParseUser.getCurrentUser().getObjectId(), other_person_id, text, image, true);
 
                 }
             }
         });
+    }
+
+    public void callMessagingEventPushNotification() {
+        ActivityUtility.Helper.callPushNotification(other_person_object, "You received a message from " + ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME), GetConnectedConstants.EVENT_MESSAGING);
     }
 
 
@@ -347,12 +351,9 @@ public class Chatting extends AppCompatActivity implements ChatMessageAdapter.IC
                     adapter.setNotifyOnChange(true);
                     message_edit.setText("");
                     if (conversationHistory != null) {
-
-                        ActivityUtility.Helper.writeErrorLog("not null img in chat");
-                        ActivityUtility.Helper.sendPushNotification(other_person_object, "You received a message from " + ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME));
+                        callMessagingEventPushNotification();
                         updateConversationHistory(conversationHistory, currentMessageId, uploadImaageId, ParseUser.getCurrentUser().getObjectId(), other_person_id, true, true);
                     } else {
-                        ActivityUtility.Helper.writeErrorLog("null img in chat");
                         getOtherPersonId(other_person_id, uploadImaageId, true);
                     }
                 }
@@ -438,9 +439,9 @@ public class Chatting extends AppCompatActivity implements ChatMessageAdapter.IC
     }
 
 
-    public void updateReadStatusForConversationHistory(final int position){
+    public void updateReadStatusForConversationHistory(final int position) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.MESSAGES_TABLE);
-        query.whereEqualTo(ParseConstants.MESSAGES_IDENTIFIER,ParseUser.getCurrentUser().getObjectId()+","+other_person_id);
+        query.whereEqualTo(ParseConstants.MESSAGES_IDENTIFIER, ParseUser.getCurrentUser().getObjectId() + "," + other_person_id);
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject object, ParseException e) {
@@ -451,9 +452,9 @@ public class Chatting extends AppCompatActivity implements ChatMessageAdapter.IC
                         JSONObject obj = jsonArray.getJSONObject(position);
                         obj.put(GetConnectedConstants.JSON_STATUS, GetConnectedConstants.CHAT_STATUS_READ);
                         jsonArray.put(position, obj);
-                        root= new JSONObject();
+                        root = new JSONObject();
                         root.put("MessageRoot", jsonArray);
-                        object.put(ParseConstants.MESSAGES_MESSAGES,root);
+                        object.put(ParseConstants.MESSAGES_MESSAGES, root);
                         object.saveInBackground();
 
                     } catch (JSONException e1) {
@@ -462,8 +463,6 @@ public class Chatting extends AppCompatActivity implements ChatMessageAdapter.IC
                 }
             }
         });
-
-
 
 
     }

@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.RadioGroup;
 
 import com.example.chandra.getconnected.constants.GetConnectedConstants;
+import com.example.chandra.getconnected.constants.ParseConstants;
 import com.example.chandra.getconnected.utility.ActivityUtility;
 import com.parse.FindCallback;
 import com.parse.Parse;
@@ -182,10 +183,7 @@ public class Signup extends AppCompatActivity implements RadioGroup.OnCheckedCha
                 @Override
                 public void done(ParseException e) {
                     if (e == null) {
-                        ActivityUtility.Helper.showNotificationLogin(coordinatorLayout, GetConnectedConstants.NEW_USER_MESSAGE + " " + params[0].getString(GetConnectedConstants.USER_FIRST_NAME));
-                        Intent intent = new Intent(Signup.this, Home.class);
-                        startActivity(intent);
-                        finish();
+                        sendNotificationToOtherUsers();
                     } else {
                         ActivityUtility.Helper.writeErrorLog(e.toString());
                         ActivityUtility.Helper.makeToast(Signup.this, "Signup failed");
@@ -315,6 +313,34 @@ public class Signup extends AppCompatActivity implements RadioGroup.OnCheckedCha
 
 
         new Upload().execute(imageParseFile);
+    }
+
+    public void sendNotificationToOtherUsers(){
+
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereNotEqualTo(ParseConstants.OBJECT_ID, ParseUser.getCurrentUser().getObjectId());
+        query.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                if (e == null) {
+                    for (ParseUser user : objects) {
+                        ActivityUtility.Helper.callPushNotification(user, ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME) + " " + "has joined GetConnected", GetConnectedConstants.EVENT_MESSAGING);
+                    }
+
+                } else {
+                    ActivityUtility.Helper.writeErrorLog(e.toString());
+                }
+            }
+        });
+
+        showHome();
+    }
+
+    public void showHome(){
+        dialog.dismiss();
+        Intent intent = new Intent(Signup.this, Home.class);
+        startActivity(intent);
+        finish();
     }
 
 }

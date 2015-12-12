@@ -1,0 +1,10 @@
+{
+  "applications": {
+    "LoginTest": {
+      "applicationId": "hEbpztyvLOKejp5kVrfiEpffICf4NYuRghcL4SCk"
+    },
+    "_default": {
+      "link": "LoginTest"
+    }
+  }
+}

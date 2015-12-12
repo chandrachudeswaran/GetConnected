@@ -179,9 +179,10 @@ public class PhotoAdapter extends BaseAdapter {
         notification.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                ActivityUtility.Helper.sendPushNotification(sendApprovalUser,
-                        ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME) + " " + text + " the photo to the album " + photoBelongToAlbum.getString(ParseConstants.ALBUM_FIELD_TITLE));
-                        ((IPhotoAdapter) context).finishApproval();
+                //ActivityUtility.Helper.sendPushNotification(sendApprovalUser,
+                        //ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME) + " " + text + " the photo to the album " + photoBelongToAlbum.getString(ParseConstants.ALBUM_FIELD_TITLE));
+              ActivityUtility.Helper.callPushNotification(sendApprovalUser," " + text + " the photo to the album " + photoBelongToAlbum.getString(ParseConstants.ALBUM_FIELD_TITLE),GetConnectedConstants.EVENT_PHOTO_ADDED);
+                      ((IPhotoAdapter) context).finishApproval();
             }
         });
     }

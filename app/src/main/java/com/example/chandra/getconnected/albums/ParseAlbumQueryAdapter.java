@@ -472,8 +472,10 @@ public class ParseAlbumQueryAdapter extends ParseQueryAdapter<ParseObject> {
         notification.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                ActivityUtility.Helper.sendPushNotification(sendApprovalUser,ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME) + " " + "shared an album with you");
 
+                ActivityUtility.Helper.writeErrorLog("notifications");
+                //ActivityUtility.Helper.sendPushNotification(sendApprovalUser,ParseUser.getCurrentUser().getString(GetConnectedConstants.USER_FIRST_NAME) + " " + "shared an album with you");
+                ActivityUtility.Helper.callPushNotification(sendApprovalUser," "+ "shared an album with you",GetConnectedConstants.EVENT_ALBUM_SHARE);
             }
         });
     }
